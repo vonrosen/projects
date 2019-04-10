@@ -10,8 +10,8 @@ public class QuickSort<T extends Comparable<T>> {
 		
 		sortRange(array, 0, array.length - 1);
 	}
-
 	private static <T extends Comparable<T>> void sortRange(T [] array, int start, int end) {
+		
 		
 		if (array == null || start >= end) {
 			return;
@@ -61,10 +61,8 @@ public class QuickSort<T extends Comparable<T>> {
 		for (int i = 0; i < intsToSort.length; ++i) {
 			System.out.println(intsToSort[i]);
 		}
-		
-		
+				
 		String [] stringsToSort = { "xx", "ee", "rrtr", "ccc", "b", "bb", "a", "yyyyy", "ttt" };
-		//Integer [] intsToSort = { 77, 3 };
 		
 		System.out.println("Before sort:");
 		for (int i = 0; i < stringsToSort.length; ++i) {
