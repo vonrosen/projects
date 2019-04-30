@@ -5,94 +5,228 @@ import java.util.Scanner;
 
 public class Solution {
 
-    // Complete the climbingLeaderboard function below.
-    static int[] climbingLeaderboard(int[] scores, int[] alice) {
+	private static int findRank(int aliceScore, int[] scores, int start, int end) {
 
-    	//scores in desc order
-    	//alice in asc order
+		if (start >= end) {
+			if (scores[start] > aliceScore) {
+				return allRanks[start] == 1 ? 1 : allRanks[start] - 1;
+			}
+			else if (scores[start] < aliceScore) {
+				return allRanks[start];
+			}
+		}
 
-    	int [] aliceRanks = new int[alice.length];
-    	int aliceRankIndex = 0;
+		int mid = start + ((end - start) / 2);
 
-    	for (int aliceScore: alice) {
-        	int currentScoreRank = 1;
-        	int aliceRank = 1;
+		if (scores[mid] > aliceScore) {
+			return findRank(aliceScore, scores, start, mid);
+		}
+		else if (scores[mid] < aliceScore) {
+			return findRank(aliceScore, scores, start, mid);
+		}
+		else {
+			return allRanks[mid];
+		}
+	}
 
-    		for (int scoreIndex = 0; scoreIndex < scores.length; ++scoreIndex) {
-    			if (scoreIndex > 0 && scores[scoreIndex] != scores[scoreIndex - 1]) {
-    				++currentScoreRank;
-    			}
+	static int [] allRanks = null;
 
-//    			System.out.println("cs:" + scores[scoreIndex]);
-//    			System.out.println("csr:" + currentScoreRank);
+	static int[] climbingLeaderboard(int[] scores, int[] alice) {
+		int[] aliceRanks = new int[alice.length];
+		int aliceRankIndex = 0;
+    	int currentScoreRank = 1;
+    	allRanks = new int[scores.length];
 
-    			if (aliceScore < scores[scoreIndex]) {
-    				//she lost
-    				aliceRank = currentScoreRank + 1;
-    			}
-    			else if (aliceScore == scores[scoreIndex]) {
-    				aliceRank = currentScoreRank;
-    				break;
-    			}
-    			else {
-    				//she won
-    				aliceRank = currentScoreRank == 1 ? 1 : currentScoreRank;
-    				break;
-    			}
-    		}
+    	for (int scoreIndex = 0; scoreIndex < scores.length; ++scoreIndex) {
+			if (scoreIndex > 0 && scores[scoreIndex] != scores[scoreIndex - 1]) {
+				++currentScoreRank;
+			}
 
-    		aliceRanks[aliceRankIndex++] = aliceRank;
+			allRanks[scoreIndex] = currentScoreRank;
     	}
 
-    	return aliceRanks;
-    }
+		for (int aliceScore : alice) {
+			aliceRanks[aliceRankIndex++] = findRank(aliceScore, scores, 0, scores.length - 1);
+		}
 
-    private static final Scanner scanner = new Scanner(System.in);
+		return aliceRanks;
+	}
 
-    public static void main(String[] args) throws IOException {
-        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(System.getenv("OUTPUT_PATH")));
+//	static int[] climbingLeaderboard(int[] scores, int[] alice) {
+//
+//    	//scores in desc order
+//    	//alice in asc order
+//
+//    	int [] aliceRanks = new int[alice.length];
+//    	int [] allRanks = new int[scores.length];
+//    	int [] allRanksSorted = new int[scores.length];
+//    	int aliceRankIndex = 0;
+//    	int lastScoreIndex = scores.length;
+//    	int currentScoreRank = 1;
+//
+//    	for (int scoreIndex = 0; scoreIndex < scores.length; ++scoreIndex) {
+//			if (scoreIndex > 0 && scores[scoreIndex] != scores[scoreIndex - 1]) {
+//				++currentScoreRank;
+//			}
+//
+//			allRanks[scoreIndex] = currentScoreRank;
+//			allRanksSorted[scoreIndex] = currentScoreRank;
+//    	}
+//
+//    	if (alice[0] >= scores[0]) {
+//    		for (int i = 0; i < aliceRanks.length; ++i) {
+//    			aliceRanks[i] = 1;
+//    		}
+//
+//    		return aliceRanks;
+//    	}
+//
+//    	if (alice[alice.length - 1] < scores[scores.length - 1]) {
+//        	Arrays.sort(allRanksSorted);
+//
+//    		for (int i = 0; i < aliceRanks.length; ++i) {
+//    			aliceRanks[i] = allRanksSorted[scores.length - 1] + 1;
+//    		}
+//
+//    		return aliceRanks;
+//    	}
+//
+//    	for (int aliceScore: alice) {
+//
+//        	int aliceRank = 1;
+//
+//    		for (int scoreIndex = 0; scoreIndex < lastScoreIndex; ++scoreIndex) {
+////    			if (scoreIndex > 0 && scores[scoreIndex] != scores[scoreIndex - 1]) {
+////    				++currentScoreRank;
+////    			}
+//
+////    			System.out.println("cs:" + scores[scoreIndex]);
+////    			System.out.println("csr:" + currentScoreRank);
+//
+//    			if (aliceScore < scores[scoreIndex]) {
+//    				//she lost
+//    				aliceRank = allRanks[scoreIndex] + 1;
+//    			}
+//    			else if (aliceScore == scores[scoreIndex]) {
+//    				aliceRank = allRanks[scoreIndex];
+//    				lastScoreIndex = scoreIndex;
+//    				break;
+//    			}
+//    			else {
+//    				//she won
+//    				aliceRank = allRanks[scoreIndex];
+//    				lastScoreIndex = scoreIndex;
+//    				break;
+//    			}
+//    		}
+//
+//    		aliceRanks[aliceRankIndex++] = aliceRank;
+//    	}
+//
+//    	return aliceRanks;
+//    }
 
-        int scoresCount = scanner.nextInt();
-        scanner.skip("(\r\n|[\n\r\u2028\u2029\u0085])?");
+//	static int findRank(int aliceScore, int [] scores, int begin, int end) {
+//
+//		int mid = begin + ((end - begin) / 2);
+//
+//
+//
+//
+//	}
 
-        int[] scores = new int[scoresCount];
+	// Complete the climbingLeaderboard function below.
+//    static int[] climbingLeaderboard(int[] scores, int[] alice) {
+//    	int [] aliceRanks = new int[alice.length];
+//    	int [] allRanks = new int[scores.length];
+//    	int aliceRankIndex = 0;
+//    	int currentScoreRank = 1;
+//
+//    	for (int scoreIndex = 0; scoreIndex < scores.length; ++scoreIndex) {
+//			if (scoreIndex > 0 && scores[scoreIndex] != scores[scoreIndex - 1]) {
+//				++currentScoreRank;
+//			}
+//
+//			allRanks[scoreIndex] = currentScoreRank;
+//    	}
+//
+//    	for (int aliceScore: alice) {
+//    		aliceRanks[aliceRankIndex++] = findRank(aliceScore, scores);
+//    	}
+//
+//    	int lastRankIndex = 0;
+//
+//    	for (int aliceScore: alice) {
+//        	int aliceRank = 1;
+//
+//    		for (int rankIndex = lastRankIndex; rankIndex < allRanks.length; ++rankIndex) {
+//    			if (aliceScore < scores[rankIndex]) {
+//    				aliceRank = allRanks[rankIndex] + 1;
+//    			}
+//    			else if (aliceScore == scores[rankIndex]) {
+//    				aliceRank = allRanks[rankIndex];
+//    				lastRankIndex = rankIndex;
+//    				break;
+//    			}
+//    			else {
+//    				aliceRank = allRanks[rankIndex];
+//    				lastRankIndex = rankIndex;
+//    				break;
+//    			}
+//    		}
+//
+//    		aliceRanks[aliceRankIndex++] = aliceRank;
+//    	}
+//
+//    	return aliceRanks;
+//    }
 
-        String[] scoresItems = scanner.nextLine().split(" ");
-        scanner.skip("(\r\n|[\n\r\u2028\u2029\u0085])?");
+	private static final Scanner scanner = new Scanner(System.in);
 
-        for (int i = 0; i < scoresCount; i++) {
-            int scoresItem = Integer.parseInt(scoresItems[i]);
-            scores[i] = scoresItem;
-        }
+	public static void main(String[] args) throws IOException {
+		BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(System.getenv("OUTPUT_PATH")));
 
-        int aliceCount = scanner.nextInt();
-        scanner.skip("(\r\n|[\n\r\u2028\u2029\u0085])?");
+		int scoresCount = scanner.nextInt();
+		scanner.skip("(\r\n|[\n\r\u2028\u2029\u0085])?");
 
-        int[] alice = new int[aliceCount];
+		int[] scores = new int[scoresCount];
 
-        String[] aliceItems = scanner.nextLine().split(" ");
-        scanner.skip("(\r\n|[\n\r\u2028\u2029\u0085])?");
+		String[] scoresItems = scanner.nextLine().split(" ");
+		scanner.skip("(\r\n|[\n\r\u2028\u2029\u0085])?");
 
-        for (int i = 0; i < aliceCount; i++) {
-            int aliceItem = Integer.parseInt(aliceItems[i]);
-            alice[i] = aliceItem;
-        }
+		for (int i = 0; i < scoresCount; i++) {
+			int scoresItem = Integer.parseInt(scoresItems[i]);
+			scores[i] = scoresItem;
+		}
 
-        int[] result = climbingLeaderboard(scores, alice);
+		int aliceCount = scanner.nextInt();
+		scanner.skip("(\r\n|[\n\r\u2028\u2029\u0085])?");
 
-        for (int i = 0; i < result.length; i++) {
-        	System.out.println(result[i]);
-            bufferedWriter.write(String.valueOf(result[i]));
+		int[] alice = new int[aliceCount];
 
-            if (i != result.length - 1) {
-                bufferedWriter.write("\n");
-            }
-        }
+		String[] aliceItems = scanner.nextLine().split(" ");
+		scanner.skip("(\r\n|[\n\r\u2028\u2029\u0085])?");
 
-        bufferedWriter.newLine();
+		for (int i = 0; i < aliceCount; i++) {
+			int aliceItem = Integer.parseInt(aliceItems[i]);
+			alice[i] = aliceItem;
+		}
 
-        bufferedWriter.close();
+		int[] result = climbingLeaderboard(scores, alice);
 
-        scanner.close();
-    }
+		for (int i = 0; i < result.length; i++) {
+			System.out.println(result[i]);
+			bufferedWriter.write(String.valueOf(result[i]));
+
+			if (i != result.length - 1) {
+				bufferedWriter.write("\n");
+			}
+		}
+
+		bufferedWriter.newLine();
+
+		bufferedWriter.close();
+
+		scanner.close();
+	}
 }
