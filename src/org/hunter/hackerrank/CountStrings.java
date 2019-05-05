@@ -2,6 +2,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 public class CountStrings {
 
@@ -12,20 +13,9 @@ public class CountStrings {
 
 	static String [] lengthTwoPossible = {
 			"aa",
-			"bb",
 			"ab",
+			"bb",
 			"ba"
-	};
-
-	static String [] lengthThreePossible = {
-			"aaa",
-			"abb",
-			"aab",
-			"aba",
-			"bbb",
-			"baa",
-			"bba",
-			"bab"
 	};
 
     /*
@@ -41,16 +31,49 @@ public class CountStrings {
 
     	String [] possibleStrings = calculatePossibleStrings(l);
 
-    	System.out.println("ps:");
-    	for (int i = 0; i < possibleStrings.length; ++i) {
-    		System.out.println(possibleStrings[i]);
-    	}
-
-//    	for (String ps : possibleStrings) {
-//    		Pattern.matches(r, ps);
+//    	System.out.println("ps:");
+//    	for (int i = 0; i < possibleStrings.length; ++i) {
+//    		System.out.println(possibleStrings[i]);
 //    	}
 
-    	return 0;
+    	int matches = 0;
+    	for (String ps : possibleStrings) {
+    		matches += Pattern.matches(r, ps) ? 1 : 0;
+    	}
+
+    	System.out.println("matches " + matches);
+    	return matches;
+    }
+
+    private static String [] calc(String [] strings) {
+    	double length = strings.length * strings.length;
+    	String [] newStrings = new String[length];
+
+//    	System.out.println("nsl" + newStrings.length);
+
+    	int newStringIter = 0;
+    	for (int i = 0; i < strings.length; ++i) {
+    		for (int j = 0; j < strings.length; ++j) {
+    			newStrings[newStringIter] = strings[i] + strings[j];
+    			++newStringIter;
+    		}
+    	}
+
+    	return newStrings;
+    }
+
+    private static String [] calc(String [] strings1, String [] strings2) {
+    	String [] newStrings = new String[strings1.length * strings2.length];
+
+    	int newStringIter = 0;
+    	for (int i = 0; i < strings1.length; ++i) {
+    		for (int j = 0; j < strings2.length; ++j) {
+    			newStrings[newStringIter] = strings1[i] + strings2[j];
+    			newStringIter++;
+     		}
+    	}
+
+    	return newStrings;
     }
 
     private static String[] calculatePossibleStrings(int l) {
@@ -62,69 +85,24 @@ public class CountStrings {
     		return lengthTwoPossible;
     	}
 
-    	if (l == 3) {
-    		return lengthThreePossible;
+    	int possiblyAdjustedLength = l;
+
+    	if (l % 2 > 0) {
+    		possiblyAdjustedLength--;
     	}
 
-    	int iterations = l / 2;
-    	int baseComboIndex = 0;
-    	int startingBaseComboIndex = 0;
-    	String [] possibleStrings = new String[(int)Math.pow(2, l)];
-
-    	for (int iterCount = 0; iterCount < iterations; ++iterCount) {
-    		startingBaseComboIndex = 0;
-        	for (int possibleStringIter = 0; possibleStringIter < possibleStrings.length; ++possibleStringIter) {
-        		if (baseComboIndex > lengthTwoPossible.length - 1) {
-
-            		if (iterCount > 0) {
-            			startingBaseComboIndex = iterCount;
-            		}
-            		else {
-            			baseComboIndex = startingBaseComboIndex;
-            		}
-        		}
-
-        		possibleStrings[possibleStringIter] =
-        				(possibleStrings[possibleStringIter] == null ? "" : possibleStrings[possibleStringIter]) + lengthTwoPossible[baseComboIndex];
-
-        		++baseComboIndex;
-        	}
+    	String [] strings = lengthTwoPossible;
+    	while (strings[0].length() < possiblyAdjustedLength) {
+    		System.out.println("lenght of strings is now " + strings.length);
+    		strings = calc(strings);
     	}
 
-//		for (int iterCount = 0; iterCount < iterations; ++iterCount) {
-//			possibleStringIter = 0;
-//			for (int i = 0; i < lengthTwoPossible.length; ++i) {
-//				possibleStrings[possibleStringIter] =
-//						(possibleStrings[possibleStringIter] == null ? "" : possibleStrings[possibleStringIter]) + lengthTwoPossible[i];
-//
-//				++possibleStringIter;
-//			}
-//		}
+    	if (l % 2 > 0) {
+    		strings = calc(strings, alphabet);
+    	}
 
-		return possibleStrings;
-
-//		for (int iterCount = 0; iterCount < iterations; ++iterCount) {
-//			possibleStringIter = 0;
-//			for (int i = 0; i < lengthTwoPossible.length; ++i) {
-//				possibleStrings[possibleStringIter] =
-//						(possibleStrings[possibleStringIter] == null ? "" : possibleStrings[possibleStringIter]) + lengthTwoPossible[i];
-//				++possibleStringIter;
-//			}
-//		}
-
-		//odd length, add one more
-//		if (l % 2 > 0) {
-//			for (int i = 0; i < possibleStrings.length; ++i) {
-//				for (int j = 0; j < alphabet.length; ++j) {
-//					possibleStrings[i] = possibleStrings[i] + alphabet[j];
-//				}
-//			}
-//		}
-//
-//		return possibleStrings;
+    	return strings;
 	}
-
-
 
 	private static final Scanner scanner = new Scanner(System.in);
 
