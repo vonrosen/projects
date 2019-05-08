@@ -2,7 +2,6 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
-import java.util.regex.Pattern;
 
 public class CountStrings {
 
@@ -18,6 +17,9 @@ public class CountStrings {
 			"ba"
 	};
 
+	private static long stringCount;
+	private static String regex = null;
+
     /*
      * Complete the countStrings function below.
      */
@@ -29,37 +31,22 @@ public class CountStrings {
     	//l = length of strings that we are finding count for that match r
     	//1000000000 = max of l
 
-    	String [] possibleStrings = calculatePossibleStrings(l);
+    	regex = r;
+    	stringCount = 0;
+    	calculateStringCount(l);
 
 //    	System.out.println("ps:");
 //    	for (int i = 0; i < possibleStrings.length; ++i) {
 //    		System.out.println(possibleStrings[i]);
 //    	}
 
-    	int matches = 0;
-    	for (String ps : possibleStrings) {
-    		matches += Pattern.matches(r, ps) ? 1 : 0;
-    	}
+//    	int matches = 0;
+//    	for (String ps : possibleStrings) {
+//    		matches += Pattern.matches(r, ps) ? 1 : 0;
+//    	}
 
-    	System.out.println("matches " + matches);
-    	return matches;
-    }
-
-    private static String [] calc(String [] strings) {
-    	double length = strings.length * strings.length;
-    	String [] newStrings = new String[length];
-
-//    	System.out.println("nsl" + newStrings.length);
-
-    	int newStringIter = 0;
-    	for (int i = 0; i < strings.length; ++i) {
-    		for (int j = 0; j < strings.length; ++j) {
-    			newStrings[newStringIter] = strings[i] + strings[j];
-    			++newStringIter;
-    		}
-    	}
-
-    	return newStrings;
+    	System.out.println("matches " + stringCount);
+    	return (int)(stringCount % (long)Math.pow(10, 9));
     }
 
     private static String [] calc(String [] strings1, String [] strings2) {
@@ -76,13 +63,49 @@ public class CountStrings {
     	return newStrings;
     }
 
-    private static String[] calculatePossibleStrings(int l) {
+    //max n = 1000000000
+	private static int raisesTo(int n) {
+		long result = 2;
+		int iter = 0;
+		while (true) {
+			result *= result;
+			if (result > n) {
+				break;
+			} else {
+				iter++;
+			}
+		}
+
+		return iter;
+	}
+
+    private static void calc(String [] strings) {
+    	StringBuffer sb = new StringBuffer();
+
+    	for (int i = 0; i < strings.length; ++i) {
+    		sb.append(strings[i]);
+    		for (int k = 0; i < sb.length(); ++k) {
+
+
+
+    		}
+    	}
+    }
+
+//	if (Pattern.matches(regex, strings[i] + strings[j])) {
+//		stringCount++;
+//	}
+
+
+    private static void calculateStringCount(int l) {
     	if (l == 1) {
-    		return new String [] { "a", "b" };
+    		stringCount = new String [] { "a", "b" }.length;
+    		return;
     	}
 
     	if (l == 2) {
-    		return lengthTwoPossible;
+    		stringCount = lengthTwoPossible.length;
+    		return;
     	}
 
     	int possiblyAdjustedLength = l;
@@ -91,17 +114,12 @@ public class CountStrings {
     		possiblyAdjustedLength--;
     	}
 
-    	String [] strings = lengthTwoPossible;
-    	while (strings[0].length() < possiblyAdjustedLength) {
-    		System.out.println("lenght of strings is now " + strings.length);
-    		strings = calc(strings);
-    	}
+    	int iterations = timesToMultiple(possiblyAdjustedLength);
+    	calc(lengthTwoPossible, iterations);
 
     	if (l % 2 > 0) {
     		strings = calc(strings, alphabet);
     	}
-
-    	return strings;
 	}
 
 	private static final Scanner scanner = new Scanner(System.in);
