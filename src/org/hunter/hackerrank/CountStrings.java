@@ -2,6 +2,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 public class CountStrings {
 
@@ -35,6 +36,8 @@ public class CountStrings {
     	stringCount = 0;
     	calculateStringCount(l);
 
+    	System.out.println("count is " + stringCount);
+
 //    	System.out.println("ps:");
 //    	for (int i = 0; i < possibleStrings.length; ++i) {
 //    		System.out.println(possibleStrings[i]);
@@ -45,7 +48,7 @@ public class CountStrings {
 //    		matches += Pattern.matches(r, ps) ? 1 : 0;
 //    	}
 
-    	System.out.println("matches " + stringCount);
+    	//System.out.println("matches " + stringCount);
     	return (int)(stringCount % (long)Math.pow(10, 9));
     }
 
@@ -79,17 +82,23 @@ public class CountStrings {
 		return iter;
 	}
 
-    private static void calc(String [] strings) {
-    	StringBuffer sb = new StringBuffer();
+    private static void calc(String [] strings, int length) {
+    	for (int stringCtr = 0; stringCtr < strings.length; ++stringCtr) {
+			StringBuffer sb = new StringBuffer(strings[stringCtr]);
+			for (int i = 0; i < 30; ++i) {
+				while (sb.length() < length) {
+	    			for (int k = 0; k < strings.length; ++k) {
+	    				sb.append(strings[k]);
+	    			}
+				}
 
-    	for (int i = 0; i < strings.length; ++i) {
-    		sb.append(strings[i]);
-    		for (int k = 0; i < sb.length(); ++k) {
+				System.out.println("final str to check is " + sb.toString());
 
-
-
-    		}
-    	}
+				if (Pattern.matches(regex, sb.toString())) {
+					++stringCount;
+				}
+			}
+		}
     }
 
 //	if (Pattern.matches(regex, strings[i] + strings[j])) {
@@ -98,13 +107,23 @@ public class CountStrings {
 
 
     private static void calculateStringCount(int l) {
+    	//System.out.println("l " + l);
     	if (l == 1) {
-    		stringCount = new String [] { "a", "b" }.length;
+    		for (int i = 0; i < alphabet.length; ++i) {
+    			if (Pattern.matches(regex, alphabet[i])) {
+    				stringCount++;
+    			}
+    		}
+
     		return;
     	}
 
     	if (l == 2) {
-    		stringCount = lengthTwoPossible.length;
+    		for (int i = 0; i < lengthTwoPossible.length; ++i) {
+    			if (Pattern.matches(regex, lengthTwoPossible[i])) {
+    				stringCount++;
+    			}
+    		}
     		return;
     	}
 
@@ -114,12 +133,12 @@ public class CountStrings {
     		possiblyAdjustedLength--;
     	}
 
-    	int iterations = timesToMultiple(possiblyAdjustedLength);
-    	calc(lengthTwoPossible, iterations);
+    	calc(lengthTwoPossible, possiblyAdjustedLength);
 
-    	if (l % 2 > 0) {
-    		strings = calc(strings, alphabet);
-    	}
+
+//    	if (l % 2 > 0) {
+//    		strings = calc(strings, alphabet);
+//    	}
 	}
 
 	private static final Scanner scanner = new Scanner(System.in);
