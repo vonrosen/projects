@@ -1,0 +1,80 @@
+For regex with *, remove the * and find count for all possible strings of length of 1 or 2, whichever is correct length of modified regex
+
+((a|b)*)
+((a|b))
+
+for length of 2
+
+
+3
+((ab)|(ba)) 2
+((a|b)*) 5
+((a*)(b(a*))) 100
+
+
+1
+((a|b)) 2
+
+Length 1 count is 2 for above.
+
+
+((Ab)(ba)(((((ab))(ba)(ab))
+
+1
+((a*)(b(a*))) 2
+
+
+starting with first char of regex, determine count of strings that match. Then move to next char
+
+1
+((((ab)|b)*)|(((aa)|(bb))*)) 9
+
+4 is min length
+
+((a((((((ba)*)(b((b|((b(b(b*)))*))*)))*)*)|((bb)|(((b((ba)*))|((a|(a|b))*))*))))|(b|(b*))) 81748280
+
+81748280 - 10 = 81748270
+
+81748280 / 10 = 8174828
+
+Answer is: 498325085
+
+((a((((((ba)*)(b((b|((b(b(b*)))*))*)))*)*)|((bb)|(((b((ba)*))|((a|(a|b))*))*))))|(b|(b*))) 10
+
+
+
+((((((((((((((((ba)b)b)a)b)b)a)a)a)a)b)b)a)a)b)a) 17
+
+
+Break or into 2:
+
+(a|b) = (a) and (b) compare string to both if 1 matches it’s a match
+
+(a(((b|(a(ba)))*)b)) 18
+
+(a((((a(ba)))*)b)) 18
+(a(((b)*)b)) 18
+
+
+
+- find states
+- define stochastic matrix for states (probabilities of moving from I to j where I is rows and j is columns)
+- define accept set of states
+- add all probabilities in accept set of states
+- multiply sum of probabilities by number of possible strings of length k. N^K * (sum of probabilities of accept set)
+
+
+a(b*c|c*d)
+https://medium.freecodecamp.org/state-machines-basics-of-computer-science-d42855debc66
+https://www.gamedev.net/articles/programming/general-and-gameplay-programming/finite-state-machines-and-regular-expressions-r3176/
+http://pi.math.cornell.edu/~mec/Winter2009/RalucaRemus/Lecture2/lecture2.html
+create tree
+
+
+((((ab)|(ba))*)|(((aa)|(bb))*)) 14
+
+((ab)|(ba))* | ((aa)|(bb))*
+
+
+state 1: a ->
+         b ->

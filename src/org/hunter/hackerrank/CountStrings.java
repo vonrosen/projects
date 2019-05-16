@@ -41,7 +41,7 @@ public class CountStrings {
 		// }
 
 		// System.out.println("matches " + stringCount);
-		return (int) (stringCount % (long) Math.pow(10, 9));
+		return (int) (stringCount % (long) (Math.pow(10, 9) + 7));
 	}
 
 	private static String[] calc(String[] strings1, String[] strings2) {
@@ -89,20 +89,38 @@ public class CountStrings {
 				if (Pattern.matches(regex, sb.toString())) {
 					++stringCount;
 				}
+				else {
+					
+				}
 			}
 		}
 	}
 
-	private static void calc1(String currentString, String[] strings, int length) {
+	private static int checkCount = 0;
+	
+	
+	private static void createSm(String regex) {
+		int [][] states = new int[Integer.MAX_VALUE][2];
 		
-		System.out.println(currentString.length());
+		for (int i = 0; i < regex.length(); ++i) {
+			
+			
+		}
+		
+		
+	}
+	
+	
+	private static void calc1(String currentString, String[] strings, int length) {
+
+		//System.out.println(currentString.length());
 		
 		if (currentString.length() == length) {
-			System.out.println("EOLENGTH!");
 			if (Pattern.matches(regex, currentString)) {
 				stringCount++;
-				return;
 			}
+			
+			return;
 		}
 		
 		for (int i = 0; i < strings.length; ++i) {
@@ -135,14 +153,14 @@ public class CountStrings {
 			return;
 		}
 
-		int possiblyAdjustedLength = l;
-
-		if (l % 2 > 0) {
-			possiblyAdjustedLength--;
-		}
+//		int possiblyAdjustedLength = l;
+//
+//		if (l % 2 > 0) {
+//			possiblyAdjustedLength--;
+//		}
 
 		//calc(lengthTwoPossible, possiblyAdjustedLength);
-		calc1("", lengthTwoPossible, possiblyAdjustedLength);
+		calc1("", alphabet, l);
 
 		// if (l % 2 > 0) {
 		// strings = calc(strings, alphabet);
