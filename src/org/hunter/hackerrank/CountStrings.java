@@ -5,6 +5,13 @@ import java.util.Scanner;
 import java.util.regex.Pattern;
 
 public class CountStrings {
+	
+	class NFA {
+		
+		NFA initialState
+		
+	}
+	
 
 	static String[] alphabet = { "a", "b" };
 
