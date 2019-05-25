@@ -5,13 +5,6 @@ import java.util.Scanner;
 import java.util.regex.Pattern;
 
 public class CountStrings {
-	
-	class NFA {
-		
-		NFA initialState
-		
-	}
-	
 
 	static String[] alphabet = { "a", "b" };
 
@@ -19,6 +12,76 @@ public class CountStrings {
 
 	private static long stringCount;
 	private static String regex = null;
+
+
+	static class ParseNode {
+		enum Type { CHAR, STAR, ALT, CONCAT };
+		Type type = null;
+		ParseNode left = null;
+		ParseNode right = null;
+		ParseNode parent = null;
+		String data = null;
+	}
+
+	private static ParseNode regexToExpressionTree(String regex) {
+		ParseNode currentNode = new ParseNode();
+		ParseNode rootNode = currentNode;
+		ParseNode lastNode = rootNode;
+
+		for (int i = 0; i < regex.length(); ++i) {
+			char c = regex.charAt(i);
+
+			if (c == '(') {
+				if (i > 0) {
+					currentNode = new ParseNode();
+					lastNode.left = currentNode;
+					lastNode = currentNode;
+				}
+			}
+			else if (c == '|') {
+				lastNode.left = currentNode;
+				currentNode = new ParseNode();
+			}
+			else if (c == '*') {
+				currentNode = new ParseNode(ParseNode.Type.STAR, currentNode, null, null);
+			}
+			else if (c == ')') {
+
+			}
+			else {
+				//leaf node
+				ParseNode node = new ParseNode();
+				node.type = ParseNode.Type.CHAR;
+				node.data = Character.toString(c);
+
+
+
+			}
+
+		}
+
+	}
+
+	private static int levelsFromRegex(String regex) {
+		int levels = 0;
+
+		for (int i = 0; i < regex.length(); ++i) {
+			char c = regex.charAt(i);
+
+			if (c == '(') {
+				++levels;
+			}
+
+			if (c == ')') {
+				break;
+			}
+
+		}
+
+		return levels;
+	}
+
+
 
 	/*
 	 * Complete the countStrings function below.
@@ -97,44 +160,31 @@ public class CountStrings {
 					++stringCount;
 				}
 				else {
-					
+
 				}
 			}
 		}
 	}
 
 	private static int checkCount = 0;
-	
-	
-	private static void createSm(String regex) {
-		int [][] states = new int[Integer.MAX_VALUE][2];
-		
-		for (int i = 0; i < regex.length(); ++i) {
-			
-			
-		}
-		
-		
-	}
-	
-	
+
 	private static void calc1(String currentString, String[] strings, int length) {
 
 		//System.out.println(currentString.length());
-		
+
 		if (currentString.length() == length) {
 			if (Pattern.matches(regex, currentString)) {
 				stringCount++;
 			}
-			
+
 			return;
 		}
-		
+
 		for (int i = 0; i < strings.length; ++i) {
 			calc1(currentString + strings[i], strings, length);
 		}
-	}	
-	
+	}
+
 	// if (Pattern.matches(regex, strings[i] + strings[j])) {
 	// stringCount++;
 	// }
