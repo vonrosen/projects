@@ -1,7 +1,5 @@
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.Scanner;
+import java.util.Stack;
 import java.util.regex.Pattern;
 
 public class CountStrings {
@@ -13,6 +11,43 @@ public class CountStrings {
 	private static long stringCount;
 	private static String regex = null;
 
+	public static void main(String [] args) {
+		//ParseNode tree = regexToExpressionTree("(a|b)*abb");
+		ParseNode tree = regexToExpressionTree("((a((((((ba)*)(b((b|((b(b(b*)))*))*)))*)*)|((bb)|(((b((ba)*))|((a|(a|b))*))*))))|(b|(b*)))");
+		//ParseNode tree = regexToExpressionTree("((a|b)|(a|b)*)");
+
+		printTree(tree, 0);
+	}
+
+	private static void printTree(ParseNode tree, int indent) {
+		if (tree == null) {
+			return;
+		}
+
+		StringBuffer spaces = new StringBuffer();
+		for (int i = 0; i < indent; ++i) {
+			spaces.append(" ");
+		}
+
+		if (tree.type.equals(ParseNode.Type.CHAR)) {
+			System.out.println(spaces.toString() + tree.data);
+		}
+		else if (tree.type.equals(ParseNode.Type.ALT)) {
+			System.out.println(spaces.toString() + "|");
+			printTree(tree.left, indent + 1);
+			printTree(tree.right, indent + 1);
+		}
+		else if (tree.type.equals(ParseNode.Type.CONCAT)) {
+			System.out.println(spaces.toString() + ".");
+			printTree(tree.left, indent + 1);
+			printTree(tree.right, indent + 1);
+		}
+		else if (tree.type.equals(ParseNode.Type.STAR)) {
+			System.out.println(spaces.toString() + "*");
+			printTree(tree.left, indent + 1);
+			printTree(tree.right, indent + 1);
+		}
+	}
 
 	static class ParseNode {
 		enum Type { CHAR, STAR, ALT, CONCAT };
@@ -23,43 +58,79 @@ public class CountStrings {
 		String data = null;
 	}
 
+	static Stack<ParseNode> expressionStack = new Stack<ParseNode>();
+
 	private static ParseNode regexToExpressionTree(String regex) {
-		ParseNode currentNode = new ParseNode();
-		ParseNode rootNode = currentNode;
-		ParseNode lastNode = rootNode;
+		ParseNode lastNode = null;
+
+		//((a|b)|(a|b)*)
+		//((a|b)|(a|b))
+		//(a|b)*abb
 
 		for (int i = 0; i < regex.length(); ++i) {
 			char c = regex.charAt(i);
 
 			if (c == '(') {
-				if (i > 0) {
-					currentNode = new ParseNode();
-					lastNode.left = currentNode;
-					lastNode = currentNode;
+				ParseNode node = new ParseNode();
+				expressionStack.push(node);
+			}
+			else if (c == ')') {
+				if (i + 1 < regex.length() &&
+						regex.charAt(i + 1) == ')' || i == regex.length() - 1) {
+
+					//null, null, alt, null
+					//search for unbalanced alt at same level and balance it
+					ParseNode lastUnbalancedAlt = null;
+					for (ParseNode node : expressionStack) {
+						if (node.type != null && node.type.equals(ParseNode.Type.ALT) && node.right == null) {
+							lastUnbalancedAlt = node;
+						}
+					}
+
+					if (lastUnbalancedAlt != null) {
+						ParseNode last = expressionStack.pop();
+						lastUnbalancedAlt.right = last;
+						expressionStack.push(lastUnbalancedAlt);
+					}
 				}
 			}
 			else if (c == '|') {
-				lastNode.left = currentNode;
-				currentNode = new ParseNode();
+				ParseNode node = new ParseNode();
+				node.type = ParseNode.Type.ALT;
+				node.left = expressionStack.pop();
+				expressionStack.push(node);
 			}
 			else if (c == '*') {
-				currentNode = new ParseNode(ParseNode.Type.STAR, currentNode, null, null);
-			}
-			else if (c == ')') {
-
+				ParseNode node = new ParseNode();
+				node.type = ParseNode.Type.STAR;
+				node.left = expressionStack.pop();
+				expressionStack.push(node);
 			}
 			else {
-				//leaf node
+				//char data - leaf node
 				ParseNode node = new ParseNode();
 				node.type = ParseNode.Type.CHAR;
 				node.data = Character.toString(c);
 
-
-
+				if (expressionStack.peek().type == null) {
+					expressionStack.push(node);
+				}
+				else if (expressionStack.peek().type.equals(ParseNode.Type.ALT)) {
+					ParseNode last = expressionStack.pop();
+					last.right = node;
+					expressionStack.push(last);
+				}
+				else {
+					ParseNode node2 = new ParseNode();
+					node2.type = ParseNode.Type.CONCAT;
+					node2.right = node;
+					node2.left = expressionStack.pop();
+					expressionStack.push(node2);
+				}
 			}
-
 		}
 
+		return expressionStack.pop();
 	}
 
 	private static int levelsFromRegex(String regex) {
@@ -226,24 +297,24 @@ public class CountStrings {
 
 	private static final Scanner scanner = new Scanner(System.in);
 
-	public static void main(String[] args) throws IOException {
-		BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(System.getenv("OUTPUT_PATH")));
-
-		int t = Integer.parseInt(scanner.nextLine().trim());
-
-		for (int tItr = 0; tItr < t; tItr++) {
-			String[] rl = scanner.nextLine().split(" ");
-
-			String r = rl[0];
-
-			int l = Integer.parseInt(rl[1].trim());
-
-			int result = countStrings(r, l);
-
-			bufferedWriter.write(String.valueOf(result));
-			bufferedWriter.newLine();
-		}
-
-		bufferedWriter.close();
-	}
+//	public static void main(String[] args) throws IOException {
+//		BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(System.getenv("OUTPUT_PATH")));
+//
+//		int t = Integer.parseInt(scanner.nextLine().trim());
+//
+//		for (int tItr = 0; tItr < t; tItr++) {
+//			String[] rl = scanner.nextLine().split(" ");
+//
+//			String r = rl[0];
+//
+//			int l = Integer.parseInt(rl[1].trim());
+//
+//			int result = countStrings(r, l);
+//
+//			bufferedWriter.write(String.valueOf(result));
+//			bufferedWriter.newLine();
+//		}
+//
+//		bufferedWriter.close();
+//	}
 }
