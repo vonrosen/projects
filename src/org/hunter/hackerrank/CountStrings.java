@@ -49,6 +49,54 @@ public class CountStrings {
 		}
 	}
 
+	static class NFA {
+		static String noneStateType = "NONE";
+		static String epsStateType = "EPS";
+		int size;
+		int initial;
+		int last;
+
+		String [][] transTable = null;
+
+		void addTransition(int from, int to, String input) {
+			if (transTable == null) {
+				transTable = new String[size][size];
+			}
+
+			transTable[from][to] = input;
+		}
+
+	}
+
+	private static NFA buildNFAAlter(NFA nfa1, NFA nfa2) {
+
+	}
+
+	private static NFA appendEmptyState(NFA nfa) {
+		NFA appendedNFA = new NFA();
+		String [][] appendedTransitionTable = new String[nfa.transTable.length + 1][nfa.transTable.length + 1];
+
+		for (int i = 0; i < nfa.transTable.length; ++i) {
+			for (int j = 0; j < nfa.transTable.length; ++j) {
+				appendedTransitionTable[i][j] = nfa.transTable[i][j];
+			}
+		}
+
+		for (int i = 0; i < nfa.transTable.length + 1; ++i) {
+			appendedTransitionTable[nfa.transTable.length][i] = NFA.noneStateType;
+		}
+
+		for (int i = 0; i < nfa.transTable.length + 1; ++i) {
+			appendedTransitionTable[i][nfa.transTable.length] = NFA.noneStateType;
+		}
+
+		appendedNFA.transTable = appendedTransitionTable;
+		appendedNFA.initial = nfa.initial;
+		appendedNFA.size = nfa.size + 1;
+
+		return appendedNFA;
+	}
+
 	static class ParseNode {
 		enum Type { CHAR, STAR, ALT, CONCAT };
 		Type type = null;
