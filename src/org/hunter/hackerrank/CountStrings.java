@@ -68,7 +68,42 @@ public class CountStrings {
 
 	}
 
+	private static NFA buildNFABasic(String input) {
+		NFA basic = new NFA();
+		basic.size = 2;
+		basic.initial = 0;
+		basic.addTransition(0, 1, input);
+		return basic;
+	}
+
 	private static NFA buildNFAAlter(NFA nfa1, NFA nfa2) {
+		NFA shiftedNFA = shiftStates(nfa2, nfa1.transTable.length + 1);
+
+		NFA filledNFA = fillStates(nfa1, shiftedNFA, 1);
+		filledNFA.addTransition(0, 1, NFA.epsStateType);
+		filledNFA.addTransition(0, nfa1.transTable.length + 1, NFA.epsStateType);
+		filledNFA.addTransition(nfa1.last + 1, filledNFA.last, NFA.epsStateType);
+		filledNFA.addTransition(filledNFA.last - 1, filledNFA.last, NFA.epsStateType);
+		filledNFA.initial = 0;
+
+		return filledNFA;
+	}
+
+	private static NFA buildConcatNFA(NFA nfa1, NFA nfa2) {
+		NFA concatNFA = new NFA();
+
+		concatNFA.size = nfa1.size + nfa2.size - 1;
+		concatNFA.last = concatNFA.size - 1;
+
+		String [][] newTransitionTable = new String[concatNFA.size][concatNFA.size];
+
+		for (int i = 0; i < nfa1.size; ++i) {
+			for (int j = 0; j < nfa1.size; ++j) {
+				newTransitionTable[i][j] = nfa1.transTable[i][j];
+			}
+		}
+
+
 
 	}
 
@@ -76,25 +111,70 @@ public class CountStrings {
 		NFA appendedNFA = new NFA();
 		String [][] appendedTransitionTable = new String[nfa.transTable.length + 1][nfa.transTable.length + 1];
 
+		for (int i = 0; i < appendedTransitionTable.length; ++i) {
+			for (int j = 0; j < appendedTransitionTable.length; ++j) {
+				appendedTransitionTable[i][j] = NFA.noneStateType;
+			}
+		}
+
 		for (int i = 0; i < nfa.transTable.length; ++i) {
 			for (int j = 0; j < nfa.transTable.length; ++j) {
 				appendedTransitionTable[i][j] = nfa.transTable[i][j];
 			}
 		}
 
-		for (int i = 0; i < nfa.transTable.length + 1; ++i) {
-			appendedTransitionTable[nfa.transTable.length][i] = NFA.noneStateType;
-		}
-
-		for (int i = 0; i < nfa.transTable.length + 1; ++i) {
-			appendedTransitionTable[i][nfa.transTable.length] = NFA.noneStateType;
-		}
-
 		appendedNFA.transTable = appendedTransitionTable;
 		appendedNFA.initial = nfa.initial;
 		appendedNFA.size = nfa.size + 1;
+		appendedNFA.last = nfa.last + 1;
 
 		return appendedNFA;
+	}
+
+	private static NFA shiftStates(NFA nfa, int shift) {
+		NFA shiftedNFA = new NFA();
+		String [][] shiftedTransitionTable = new String[nfa.transTable.length + shift][nfa.transTable.length + shift];
+
+		for (int i = 0; i < shiftedTransitionTable.length; ++i) {
+			for (int j = 0; j < shiftedTransitionTable.length; ++j) {
+				shiftedTransitionTable[i][j] = NFA.noneStateType;
+			}
+		}
+
+		for (int i = 0; i < nfa.transTable.length; ++i) {
+			for (int j = 0; j < nfa.transTable.length; ++j) {
+				shiftedTransitionTable[i + shift][j + shift] = nfa.transTable[i][j];
+			}
+		}
+
+		shiftedNFA.transTable = shiftedTransitionTable;
+		shiftedNFA.initial = nfa.initial + shift;
+		shiftedNFA.size = nfa.size + shift;
+		shiftedNFA.last = nfa.last + shift;
+
+		return shiftedNFA;
+	}
+
+	private static NFA fillStates(NFA nfaSource, NFA nfaTarget, int shift) {
+		NFA newNFA = new NFA();
+		newNFA.initial = nfaTarget.initial;
+		newNFA.last = nfaTarget.last;
+		newNFA.size = nfaTarget.size;
+		newNFA.transTable = new String[newNFA.size][newNFA.size];
+
+		for (int i = 0; i < nfaTarget.size; ++i) {
+			for (int j = 0; j < nfaTarget.size; ++j) {
+				newNFA.transTable[i][j] = nfaTarget.transTable[i][j];
+			}
+		}
+
+		for (int i = 0; i < nfaSource.transTable.length; ++i) {
+			for (int j = 0; j < nfaSource.transTable.length; ++j) {
+				newNFA.transTable[i + shift][j + shift] = nfaSource.transTable[i][j];
+			}
+		}
+
+		return newNFA;
 	}
 
 	static class ParseNode {
