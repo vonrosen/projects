@@ -1,4 +1,8 @@
+package org.hunter.hackerrank;
+
+import java.util.HashSet;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.Stack;
 import java.util.regex.Pattern;
 
@@ -12,11 +16,46 @@ public class CountStrings {
 	private static String regex = null;
 
 	public static void main(String [] args) {
+		//ParseNode tree = regexToExpressionTree("(ab)");
+		//ParseNode tree = regexToExpressionTree("(a|b)");
 		//ParseNode tree = regexToExpressionTree("(a|b)*abb");
 		ParseNode tree = regexToExpressionTree("((a((((((ba)*)(b((b|((b(b(b*)))*))*)))*)*)|((bb)|(((b((ba)*))|((a|(a|b))*))*))))|(b|(b*)))");
 		//ParseNode tree = regexToExpressionTree("((a|b)|(a|b)*)");
 
 		printTree(tree, 0);
+
+		NFA nfa = expressionTreeToNFA(tree);
+
+		System.out.println("nfa initial = " + nfa.initial);
+		System.out.println("nfa last = " + nfa.last);
+		System.out.println("nfa size = " + nfa.size);
+
+		System.out.println("eps closure of 0: ");
+		int [] closureStates = epsClosure(nfa,  new Integer[]{ 0 } );
+
+		for (int i = 0; i < closureStates.length; ++i) {
+			System.out.println(closureStates[i]);
+		}
+
+	}
+
+	private static int [] epsClosure(NFA nfa, Integer [] startingStates) {
+		Set<Integer> stateSet = new HashSet<Integer>();
+
+		for (int state: startingStates) {
+			Set<Integer> movedToStates = new HashSet<Integer>();
+			nfa.getMoveToStates(nfa, state, NFA.epsStateType, movedToStates);
+			stateSet.addAll(movedToStates);
+		}
+
+		int [] result = new int[stateSet.size()];
+
+		int i = 0;
+		for (int state : stateSet) {
+			result[i++] = state;
+		}
+
+		return result;
 	}
 
 	private static void printTree(ParseNode tree, int indent) {
@@ -61,9 +100,33 @@ public class CountStrings {
 		void addTransition(int from, int to, String input) {
 			if (transTable == null) {
 				transTable = new String[size][size];
+
+				for (int i = 0; i < transTable.length; ++i) {
+					for (int j = 0; j < transTable.length; ++j) {
+						transTable[i][j] = NFA.noneStateType;
+					}
+				}
 			}
 
 			transTable[from][to] = input;
+		}
+
+		public void getMoveToStates(NFA nfa, int state, String input, Set<Integer> results) {
+			Set<Integer> set = new HashSet<Integer>();
+
+			results.add(state);
+
+			for (int i = 0; i < transTable[state].length; ++i) {
+				if (input.equals(transTable[state][i])) {
+					set.add(i);
+				}
+			}
+
+			if (set.size() > 0) {
+				for (int movedToState: set) {
+					getMoveToStates(nfa, movedToState, input, results);
+				}
+			}
 		}
 
 	}
@@ -72,39 +135,44 @@ public class CountStrings {
 		NFA basic = new NFA();
 		basic.size = 2;
 		basic.initial = 0;
+		basic.last = 1;
 		basic.addTransition(0, 1, input);
 		return basic;
 	}
 
 	private static NFA buildNFAAlter(NFA nfa1, NFA nfa2) {
-		NFA shiftedNFA = shiftStates(nfa2, nfa1.transTable.length + 1);
+		nfa1 = shiftStates(nfa1, 1);
+		nfa2 = shiftStates(nfa2, nfa1.size);
+		nfa2 = fillStates(nfa1, nfa2);
+		nfa2 = appendEmptyState(nfa2);
 
-		NFA filledNFA = fillStates(nfa1, shiftedNFA, 1);
-		filledNFA.addTransition(0, 1, NFA.epsStateType);
-		filledNFA.addTransition(0, nfa1.transTable.length + 1, NFA.epsStateType);
-		filledNFA.addTransition(nfa1.last + 1, filledNFA.last, NFA.epsStateType);
-		filledNFA.addTransition(filledNFA.last - 1, filledNFA.last, NFA.epsStateType);
-		filledNFA.initial = 0;
+		nfa2.addTransition(0, nfa1.initial, NFA.epsStateType);
+		nfa2.addTransition(0, nfa2.initial, NFA.epsStateType);
+		nfa2.addTransition(nfa1.last, nfa2.last, NFA.epsStateType);
+		nfa2.addTransition(nfa2.last - 1, nfa2.last, NFA.epsStateType);
+		nfa2.initial = 0;
 
-		return filledNFA;
+		return nfa2;
 	}
 
-	private static NFA buildConcatNFA(NFA nfa1, NFA nfa2) {
-		NFA concatNFA = new NFA();
+	private static NFA buildNFAConcat(NFA nfa1, NFA nfa2) {
+		nfa2 = shiftStates(nfa2, nfa1.size - 1);
+		nfa2 = fillStates(nfa1, nfa2);
+		nfa2.initial = nfa1.initial;
+		return nfa2;
+	}
 
-		concatNFA.size = nfa1.size + nfa2.size - 1;
-		concatNFA.last = concatNFA.size - 1;
+	private static NFA buildNFAStar(NFA nfa) {
+		nfa = shiftStates(nfa, 1);
+		nfa = appendEmptyState(nfa);
 
-		String [][] newTransitionTable = new String[concatNFA.size][concatNFA.size];
+		nfa.addTransition(0, nfa.initial, NFA.epsStateType);
+		nfa.addTransition(0, nfa.last, NFA.epsStateType);
+		nfa.addTransition(nfa.last - 1, nfa.last, NFA.epsStateType);
+		nfa.addTransition(nfa.last - 1, nfa.initial, NFA.epsStateType);
+		nfa.initial = 0;
 
-		for (int i = 0; i < nfa1.size; ++i) {
-			for (int j = 0; j < nfa1.size; ++j) {
-				newTransitionTable[i][j] = nfa1.transTable[i][j];
-			}
-		}
-
-
-
+		return nfa;
 	}
 
 	private static NFA appendEmptyState(NFA nfa) {
@@ -155,7 +223,7 @@ public class CountStrings {
 		return shiftedNFA;
 	}
 
-	private static NFA fillStates(NFA nfaSource, NFA nfaTarget, int shift) {
+	private static NFA fillStates(NFA nfaSource, NFA nfaTarget) {
 		NFA newNFA = new NFA();
 		newNFA.initial = nfaTarget.initial;
 		newNFA.last = nfaTarget.last;
@@ -170,7 +238,7 @@ public class CountStrings {
 
 		for (int i = 0; i < nfaSource.transTable.length; ++i) {
 			for (int j = 0; j < nfaSource.transTable.length; ++j) {
-				newNFA.transTable[i + shift][j + shift] = nfaSource.transTable[i][j];
+				newNFA.transTable[i][j] = nfaSource.transTable[i][j];
 			}
 		}
 
@@ -187,6 +255,24 @@ public class CountStrings {
 	}
 
 	static Stack<ParseNode> expressionStack = new Stack<ParseNode>();
+
+	private static NFA expressionTreeToNFA(ParseNode tree) {
+		if (tree.type.equals(ParseNode.Type.CHAR)) {
+			return buildNFABasic(tree.data);
+		}
+		else if (tree.type.equals(ParseNode.Type.STAR)) {
+			return buildNFAStar(expressionTreeToNFA(tree.left));
+		}
+		else if (tree.type.equals(ParseNode.Type.ALT)) {
+			return buildNFAAlter(expressionTreeToNFA(tree.left), expressionTreeToNFA(tree.right));
+		}
+		else if (tree.type.equals(ParseNode.Type.CONCAT)) {
+			return buildNFAConcat(expressionTreeToNFA(tree.left), expressionTreeToNFA(tree.right));
+		}
+		else {
+			throw new RuntimeException("type of parse node not recognized: " + tree.type);
+		}
+	}
 
 	private static ParseNode regexToExpressionTree(String regex) {
 		ParseNode lastNode = null;
@@ -260,26 +346,6 @@ public class CountStrings {
 
 		return expressionStack.pop();
 	}
-
-	private static int levelsFromRegex(String regex) {
-		int levels = 0;
-
-		for (int i = 0; i < regex.length(); ++i) {
-			char c = regex.charAt(i);
-
-			if (c == '(') {
-				++levels;
-			}
-
-			if (c == ')') {
-				break;
-			}
-
-		}
-
-		return levels;
-	}
-
 
 
 	/*
