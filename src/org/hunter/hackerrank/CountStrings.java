@@ -19,7 +19,7 @@ public class CountStrings {
 		//ParseNode tree = regexToExpressionTree("(ab)");
 		//ParseNode tree = regexToExpressionTree("(a|b)");
 		//ParseNode tree = regexToExpressionTree("(a|b)*abb");
-		ParseNode tree = regexToExpressionTree("((a((((((ba)*)(b((b|((b(b(b*)))*))*)))*)*)|((bb)|(((b((ba)*))|((a|(a|b))*))*))))|(b|(b*)))");
+		ParseNode tree = regexToExpressionTree("((bb)|((((((aa)|(b|b))|(a|b))|(((a|a)|b)|((((ab)a)*)((b|b)*))))|(((ab)(((aa)a)|b))b))*))");
 		//ParseNode tree = regexToExpressionTree("((a|b)|(a|b)*)");
 
 		printTree(tree, 0);
@@ -43,8 +43,8 @@ public class CountStrings {
 		Set<Integer> stateSet = new HashSet<Integer>();
 
 		for (int state: startingStates) {
-			Set<Integer> movedToStates = new HashSet<Integer>();
-			nfa.getMoveToStates(nfa, state, NFA.epsStateType, movedToStates);
+			Set<Integer> movedToStates = nfa.getMoveToStates(nfa, state, NFA.epsStateType);
+
 			stateSet.addAll(movedToStates);
 		}
 
@@ -88,7 +88,35 @@ public class CountStrings {
 		}
 	}
 
+	static class Transition {
+		int state;
+		String input;
+
+		@Override
+		public boolean equals(Object obj) {
+			Transition t = (Transition)obj;
+
+			return this.state == t.state && this.input.equals(t.input);
+		}
+
+		@Override
+		public int hashCode() {
+	        int result = 17;
+	        result = 31 * result + input.hashCode();
+	        result = 31 * result + state;
+	        return result;
+		}
+
+	}
+
+	static class DFA {
+		int [] start = null;
+
+
+	}
+
 	static class NFA {
+		static String [] ALPHABET = {"a", "b"};
 		static String noneStateType = "NONE";
 		static String epsStateType = "EPS";
 		int size;
@@ -96,6 +124,20 @@ public class CountStrings {
 		int last;
 
 		String [][] transTable = null;
+
+		Set<Integer> move(Set<Integer> states, String input) {
+			Set<Integer> result = new HashSet<Integer>();
+
+			for (int state: states) {
+				for (int i = 0; i < transTable[state].length; ++i) {
+					if (input.equals(transTable[state][i])) {
+						result.add(i);
+					}
+				}
+			}
+
+			return result;
+		}
 
 		void addTransition(int from, int to, String input) {
 			if (transTable == null) {
@@ -111,24 +153,36 @@ public class CountStrings {
 			transTable[from][to] = input;
 		}
 
-		public void getMoveToStates(NFA nfa, int state, String input, Set<Integer> results) {
-			Set<Integer> set = new HashSet<Integer>();
+		public Set<Integer> getMoveToStates(NFA nfa, int state, String input) {
+			Set<Integer> results = new HashSet<Integer>();
+			Set<Integer> currentStates = new HashSet<Integer>();
 
 			results.add(state);
+			currentStates.add(state);
 
-			for (int i = 0; i < transTable[state].length; ++i) {
-				if (input.equals(transTable[state][i])) {
-					set.add(i);
+			while (true) {
+				Set<Integer> set = new HashSet<Integer>();
+				for (int currentState : currentStates) {
+					for (int i = 0; i < transTable[currentState].length; ++i) {
+						if (input.equals(transTable[currentState][i])) {
+							set.add(i);
+						}
+					}
+				}
+
+				if (set.size() == 0) {
+					//no more states to process
+					break;
+				}
+				else {
+					currentStates.clear();
+					currentStates.addAll(set);
+					results.addAll(set);
 				}
 			}
 
-			if (set.size() > 0) {
-				for (int movedToState: set) {
-					getMoveToStates(nfa, movedToState, input, results);
-				}
-			}
+			return results;
 		}
-
 	}
 
 	private static NFA buildNFABasic(String input) {
@@ -144,14 +198,13 @@ public class CountStrings {
 		nfa1 = shiftStates(nfa1, 1);
 		nfa2 = shiftStates(nfa2, nfa1.size);
 		nfa2 = fillStates(nfa1, nfa2);
-		nfa2 = appendEmptyState(nfa2);
-
 		nfa2.addTransition(0, nfa1.initial, NFA.epsStateType);
 		nfa2.addTransition(0, nfa2.initial, NFA.epsStateType);
+		nfa2.initial = 0;
+		nfa2 = appendEmptyState(nfa2);
+		nfa2.last = nfa2.size - 1;
 		nfa2.addTransition(nfa1.last, nfa2.last, NFA.epsStateType);
 		nfa2.addTransition(nfa2.last - 1, nfa2.last, NFA.epsStateType);
-		nfa2.initial = 0;
-
 		return nfa2;
 	}
 
@@ -165,12 +218,12 @@ public class CountStrings {
 	private static NFA buildNFAStar(NFA nfa) {
 		nfa = shiftStates(nfa, 1);
 		nfa = appendEmptyState(nfa);
-
 		nfa.addTransition(0, nfa.initial, NFA.epsStateType);
-		nfa.addTransition(0, nfa.last, NFA.epsStateType);
-		nfa.addTransition(nfa.last - 1, nfa.last, NFA.epsStateType);
-		nfa.addTransition(nfa.last - 1, nfa.initial, NFA.epsStateType);
+		nfa.addTransition(0, nfa.size - 1, NFA.epsStateType);
+		nfa.addTransition(nfa.last, nfa.initial, NFA.epsStateType);
+		nfa.addTransition(nfa.last, nfa.size - 1, NFA.epsStateType);
 		nfa.initial = 0;
+		nfa.last = nfa.size - 1;
 
 		return nfa;
 	}
@@ -194,7 +247,6 @@ public class CountStrings {
 		appendedNFA.transTable = appendedTransitionTable;
 		appendedNFA.initial = nfa.initial;
 		appendedNFA.size = nfa.size + 1;
-		appendedNFA.last = nfa.last + 1;
 
 		return appendedNFA;
 	}

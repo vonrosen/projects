@@ -58,6 +58,8 @@ Break or into 2:
 
 
 
+((bb)|((((((aa)|(b|b))|(a|b))|(((a|a)|b)|((((ab)a)*)((b|b)*))))|(((ab)(((aa)a)|b))b))*))
+
 - find states
 - define stochastic matrix for states (probabilities of moving from I to j where I is rows and j is columns)
 - define accept set of states
