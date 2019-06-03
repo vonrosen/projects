@@ -1,6 +1,8 @@
 package org.hunter.hackerrank;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.Stack;
@@ -18,8 +20,8 @@ public class CountStrings {
 	public static void main(String [] args) {
 		//ParseNode tree = regexToExpressionTree("(ab)");
 		//ParseNode tree = regexToExpressionTree("(a|b)");
-		//ParseNode tree = regexToExpressionTree("(a|b)*abb");
-		ParseNode tree = regexToExpressionTree("((bb)|((((((aa)|(b|b))|(a|b))|(((a|a)|b)|((((ab)a)*)((b|b)*))))|(((ab)(((aa)a)|b))b))*))");
+		ParseNode tree = regexToExpressionTree("(a|b)*abb");
+		//ParseNode tree = regexToExpressionTree("((bb)|((((((aa)|(b|b))|(a|b))|(((a|a)|b)|((((ab)a)*)((b|b)*))))|(((ab)(((aa)a)|b))b))*))");
 		//ParseNode tree = regexToExpressionTree("((a|b)|(a|b)*)");
 
 		printTree(tree, 0);
@@ -30,16 +32,21 @@ public class CountStrings {
 		System.out.println("nfa last = " + nfa.last);
 		System.out.println("nfa size = " + nfa.size);
 
-		System.out.println("eps closure of 0: ");
-		int [] closureStates = epsClosure(nfa,  new Integer[]{ 0 } );
+		Set<Integer> s = new HashSet<Integer>();
+		s.add(3);
+		s.add(8);
+		System.out.println(epsClosure(nfa, s));
 
-		for (int i = 0; i < closureStates.length; ++i) {
-			System.out.println(closureStates[i]);
-		}
-
+//		DFA dfa = subsetConstruct(nfa);
+//
+//		System.out.println("dfa initial " + dfa.initial);
+//		System.out.println("dfa transtable size " + dfa.transTable.size());
+//		System.out.println("dfa final states size " + dfa.finalStates.size());
+//
+//		System.out.println(dfa.simulate("aabb"));
 	}
 
-	private static int [] epsClosure(NFA nfa, Integer [] startingStates) {
+	private static Set<Integer> epsClosure(NFA nfa, Set<Integer> startingStates) {
 		Set<Integer> stateSet = new HashSet<Integer>();
 
 		for (int state: startingStates) {
@@ -48,14 +55,7 @@ public class CountStrings {
 			stateSet.addAll(movedToStates);
 		}
 
-		int [] result = new int[stateSet.size()];
-
-		int i = 0;
-		for (int state : stateSet) {
-			result[i++] = state;
-		}
-
-		return result;
+		return stateSet;
 	}
 
 	private static void printTree(ParseNode tree, int indent) {
@@ -90,7 +90,7 @@ public class CountStrings {
 
 	static class Transition {
 		int state;
-		String input;
+		String input = "";
 
 		@Override
 		public boolean equals(Object obj) {
@@ -109,14 +109,105 @@ public class CountStrings {
 
 	}
 
-	static class DFA {
-		int [] start = null;
+	static int dfaStateCounter = 0;
 
+	static int getNewDfaState() {
+		return dfaStateCounter++;
+	}
+
+	private static boolean areStatesInSet(Set<Set<Integer>> stateSet, Set<Integer> statesToSearchFor) {
+		for (Set<Integer> states : stateSet) {
+
+			if (states.equals(statesToSearchFor)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private static DFA subsetConstruct(NFA nfa) {
+		DFA dfa = new DFA();
+		Map<Set<Integer>, Integer> nfaStatesToDfaState = new HashMap<Set<Integer>, Integer>();
+		Set<Set<Integer>> markedStates = new HashSet<Set<Integer>>();
+		Set<Set<Integer>> unMarkedStates = new HashSet<Set<Integer>>();
+
+		Set<Integer> initialNfaState = new HashSet<Integer>();
+		initialNfaState.add(nfa.initial);
+		Set<Integer> first = epsClosure(nfa, initialNfaState);
+		unMarkedStates.add(first);
+
+		dfa.initial = getNewDfaState();
+		nfaStatesToDfaState.put(first, dfa.initial);
+
+		while (!unMarkedStates.isEmpty()) {
+			Set<Integer> currentNfaStates = unMarkedStates.iterator().next();
+			markedStates.add(currentNfaStates);
+			unMarkedStates.remove(currentNfaStates);
+
+			for (int state: currentNfaStates) {
+				if (state == nfa.last) {
+					dfa.finalStates.add(nfaStatesToDfaState.get(currentNfaStates));
+				}
+			}
+
+			for (String input : nfa.alphabet) {
+				Set<Integer> movedToStates = epsClosure(nfa, nfa.move(currentNfaStates, input));
+
+				if (!areStatesInSet(unMarkedStates, movedToStates) &&
+						!areStatesInSet(markedStates, movedToStates)) {
+					unMarkedStates.add(movedToStates);
+					nfaStatesToDfaState.put(movedToStates, getNewDfaState());
+				}
+
+				Transition trans = new Transition();
+				trans.input = input;
+				trans.state = nfaStatesToDfaState.get(currentNfaStates);
+
+				dfa.transTable.put(trans, nfaStatesToDfaState.get(movedToStates));
+			}
+		}
+
+		return dfa;
+	}
+
+	static class DFA {
+		int initial = 0;
+		Set<Integer> finalStates = new HashSet<Integer>();
+		Map<Transition, Integer> transTable = new HashMap<Transition, Integer>();
+
+		String simulate(String input) {
+			int currentState = initial;
+
+			for (int i = 0; i < input.length(); ++i) {
+				String c = Character.toString(input.charAt(i));
+
+				Transition trans = new Transition();
+				trans.input = c;
+				trans.state = currentState;
+
+				if (transTable.get(trans) == null) {
+					return "REJECT";
+				}
+
+				currentState = transTable.get(trans);
+			}
+
+			System.out.println("final dfa state " + currentState);
+
+			for (int state: finalStates) {
+				if (state == currentState) {
+					return "ACCEPT";
+				}
+			}
+
+			return "REJECT";
+		}
 
 	}
 
 	static class NFA {
-		static String [] ALPHABET = {"a", "b"};
+		String [] alphabet = new String[] { "a", "b" };
 		static String noneStateType = "NONE";
 		static String epsStateType = "EPS";
 		int size;
