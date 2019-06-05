@@ -20,8 +20,8 @@ public class CountStrings {
 	public static void main(String [] args) {
 		//ParseNode tree = regexToExpressionTree("(ab)");
 		//ParseNode tree = regexToExpressionTree("(a|b)");
-		ParseNode tree = regexToExpressionTree("(a|b)*abb");
-		//ParseNode tree = regexToExpressionTree("((bb)|((((((aa)|(b|b))|(a|b))|(((a|a)|b)|((((ab)a)*)((b|b)*))))|(((ab)(((aa)a)|b))b))*))");
+		//ParseNode tree = regexToExpressionTree("(a|b)*abb");
+		ParseNode tree = regexToExpressionTree("((bb)|((((((aa)|(b|b))|(a|b))|(((a|a)|b)|((((ab)a)*)((b|b)*))))|(((ab)(((aa)a)|b))b))*))");
 		//ParseNode tree = regexToExpressionTree("((a|b)|(a|b)*)");
 
 		printTree(tree, 0);
@@ -38,7 +38,7 @@ public class CountStrings {
 		System.out.println("dfa transtable size " + dfa.transTable.size());
 		System.out.println("dfa final states size " + dfa.finalStates.size());
 
-		System.out.println(dfa.simulate("bbbbbbbbaaaab"));
+		System.out.println(dfa.simulate("b"));
 	}
 
 	private static Set<Integer> epsClosure(NFA nfa, Set<Integer> startingStates) {
@@ -197,8 +197,6 @@ public class CountStrings {
 
 				currentState = transTable.get(trans);
 			}
-
-			System.out.println("final dfa state " + currentState);
 
 			for (int state: finalStates) {
 				if (state == currentState) {

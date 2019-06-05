@@ -68,10 +68,13 @@ Break or into 2:
 
 
 a(b*c|c*d)
+https://cstheory.stackexchange.com/questions/8200/counting-words-accepted-by-a-regular-grammar
 https://medium.freecodecamp.org/state-machines-basics-of-computer-science-d42855debc66
 https://www.gamedev.net/articles/programming/general-and-gameplay-programming/finite-state-machines-and-regular-expressions-r3176/
 https://github.com/eliben/code-for-blog/tree/master/2009/regex_fsm
 http://pi.math.cornell.edu/~mec/Winter2009/RalucaRemus/Lecture2/lecture2.html
+https://math.stackexchange.com/questions/2969076/how-to-determine-the-number-of-possible-combinations-of-letters-that-contain-a-d
+
 create tree
 
 
