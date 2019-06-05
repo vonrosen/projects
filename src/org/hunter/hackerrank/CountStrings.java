@@ -38,7 +38,7 @@ public class CountStrings {
 		System.out.println("dfa transtable size " + dfa.transTable.size());
 		System.out.println("dfa final states size " + dfa.finalStates.size());
 
-		System.out.println(dfa.simulate("bbbbbbba"));
+		System.out.println(dfa.simulate("bbbbbbbbaaaab"));
 	}
 
 	private static Set<Integer> epsClosure(NFA nfa, Set<Integer> startingStates) {
@@ -108,6 +108,16 @@ public class CountStrings {
 
 	static int getNewDfaState() {
 		return dfaStateCounter++;
+	}
+
+	private static boolean isStateInSet(Set<Integer> states, Integer stateToSearchFor) {
+		for (int state : states) {
+			if (state == stateToSearchFor) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	private static boolean areStatesInSet(Set<Set<Integer>> stateSet, Set<Integer> statesToSearchFor) {
@@ -251,7 +261,9 @@ public class CountStrings {
 				for (int currentState : currentStates) {
 					for (int i = 0; i < transTable[currentState].length; ++i) {
 						if (input.equals(transTable[currentState][i])) {
-							set.add(i);
+							if (!isStateInSet(results, i)) {
+								set.add(i);
+							}
 						}
 					}
 				}
