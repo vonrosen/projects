@@ -32,18 +32,13 @@ public class CountStrings {
 		System.out.println("nfa last = " + nfa.last);
 		System.out.println("nfa size = " + nfa.size);
 
-		Set<Integer> s = new HashSet<Integer>();
-		s.add(3);
-		s.add(8);
-		System.out.println(epsClosure(nfa, s));
+		DFA dfa = subsetConstruct(nfa);
 
-//		DFA dfa = subsetConstruct(nfa);
-//
-//		System.out.println("dfa initial " + dfa.initial);
-//		System.out.println("dfa transtable size " + dfa.transTable.size());
-//		System.out.println("dfa final states size " + dfa.finalStates.size());
-//
-//		System.out.println(dfa.simulate("aabb"));
+		System.out.println("dfa initial " + dfa.initial);
+		System.out.println("dfa transtable size " + dfa.transTable.size());
+		System.out.println("dfa final states size " + dfa.finalStates.size());
+
+		System.out.println(dfa.simulate("bbbbbbba"));
 	}
 
 	private static Set<Integer> epsClosure(NFA nfa, Set<Integer> startingStates) {
@@ -338,6 +333,7 @@ public class CountStrings {
 		appendedNFA.transTable = appendedTransitionTable;
 		appendedNFA.initial = nfa.initial;
 		appendedNFA.size = nfa.size + 1;
+		appendedNFA.last = nfa.last;
 
 		return appendedNFA;
 	}
