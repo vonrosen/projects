@@ -47,6 +47,9 @@ Answer is: 498325085
 ((((((((((((((((ba)b)b)a)b)b)a)a)a)a)b)b)a)a)b)a) 17
 
 
+((bb)|((((((aa)|(b|b))|(a|b))|(((a|a)|b)|((((ab)a)*)((b|b)*))))|(((ab)(((aa)a)|b))b))*)) 653338565
+
+
 Break or into 2:
 
 (a|b) = (a) and (b) compare string to both if 1 matches it’s a match

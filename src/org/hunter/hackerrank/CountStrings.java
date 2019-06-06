@@ -18,11 +18,18 @@ public class CountStrings {
 	private static String regex = null;
 
 	public static void main(String [] args) {
-		//ParseNode tree = regexToExpressionTree("(ab)");
+
+//		((ab)|(ba)) 2
+//		((a|b)*) 5
+//		((a*)(b(a*))) 100
+
+		ParseNode tree = regexToExpressionTree("((a*)(b(a*)))");
 		//ParseNode tree = regexToExpressionTree("(a|b)");
 		//ParseNode tree = regexToExpressionTree("(a|b)*abb");
-		ParseNode tree = regexToExpressionTree("((bb)|((((((aa)|(b|b))|(a|b))|(((a|a)|b)|((((ab)a)*)((b|b)*))))|(((ab)(((aa)a)|b))b))*))");
+		//ParseNode tree = regexToExpressionTree("((bb)|((((((aa)|(b|b))|(a|b))|(((a|a)|b)|((((ab)a)*)((b|b)*))))|(((ab)(((aa)a)|b))b))*))");
 		//ParseNode tree = regexToExpressionTree("((a|b)|(a|b)*)");
+
+		int length = 100;
 
 		printTree(tree, 0);
 
@@ -38,7 +45,53 @@ public class CountStrings {
 		System.out.println("dfa transtable size " + dfa.transTable.size());
 		System.out.println("dfa final states size " + dfa.finalStates.size());
 
-		System.out.println(dfa.simulate("b"));
+		//System.out.println(dfa.simulate("b"));
+
+		//double a = 1267650600228229401496703205375D;
+
+		System.out.println("dfa transfer matrix:");
+		long [][] matrix = dfa.probabilityMatrix();
+//		for (int i = 0; i < matrix.length; ++i) {
+//			for (int j = 0; j < matrix.length; ++j) {
+//				System.out.println(matrix[i][j]);
+//			}
+//		}
+
+		long [][] productMatrix = matrixPower(matrix, 100);
+		System.out.println(productMatrix[0][2]);
+		//long sumAcceptingStates = sumAcceptingStates(productMatrix, dfa);
+		//System.out.println(sumAcceptingStates);
+
+		//System.out.println(sumAcceptingStates % (Math.pow(10, 9) + 7));
+
+//		double [][] m1 = new double[3][3];
+//		m1[0][0] = 0;
+//		m1[0][1] = 1;
+//		m1[0][2] = 2;
+//		m1[1][0] = 0;
+//		m1[1][1] = 1;
+//		m1[1][2] = 2;
+//		m1[2][0] = 0;
+//		m1[2][1] = 1;
+//		m1[2][2] = 1;
+//
+//		double [][] p = matrixPower(m1, 10);
+//		System.out.println(p[2][1]);
+	}
+
+	private static long sumAcceptingStates(long [][] productMatrix, DFA dfa) {
+		long sum = 0;
+
+		for (Transition tran : dfa.transTable.keySet()) {
+			int fromState = tran.state;
+			int toState = dfa.transTable.get(tran);
+
+			if (isStateInSet(dfa.finalStates, toState)) {
+				sum += productMatrix[fromState][toState];
+			}
+		}
+
+		return sum;
 	}
 
 	private static Set<Integer> epsClosure(NFA nfa, Set<Integer> startingStates) {
@@ -176,10 +229,56 @@ public class CountStrings {
 		return dfa;
 	}
 
+	private static long [][] matrixPower(long [][] matrix, int power) {
+		long [][] product = new long[matrix.length][matrix.length];
+		for (int i = 0; i < product.length; ++i) {
+			for (int k = 0; k < product.length; ++k) {
+				product[i][k] = matrix[i][k];
+			}
+		}
+
+		for (int i = 0; i < power - 1; ++i) {
+			product = multiplyMatrices(matrix, product);
+		}
+
+		return product;
+	}
+
+	private static long [][] multiplyMatrices(long [][] matrix1, long [][] matrix2) {
+		long [][] product = new long[matrix1.length][matrix2.length];
+
+		for (int i = 0; i < product.length; ++i) {
+			for (int j = 0; j < product.length; ++j) {
+				long sum = 0;
+				for (int ctr = 0; ctr < matrix1.length; ++ctr) {
+					sum += matrix1[i][ctr] * matrix2[ctr][j];
+				}
+
+				product[i][j] = sum;
+			}
+		}
+
+		return product;
+	}
+
+
 	static class DFA {
 		int initial = 0;
 		Set<Integer> finalStates = new HashSet<Integer>();
 		Map<Transition, Integer> transTable = new HashMap<Transition, Integer>();
+
+		long [][] probabilityMatrix() {
+			long [][] matrix = new long[transTable.size()][transTable.size()];
+
+			for (Transition tran : transTable.keySet()) {
+				int stateFrom = tran.state;
+				int stateTo = transTable.get(tran);
+
+				matrix[stateFrom][stateTo] += 1;
+			}
+
+			return matrix;
+		}
 
 		String simulate(String input) {
 			int currentState = initial;
