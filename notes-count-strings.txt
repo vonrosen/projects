@@ -71,6 +71,7 @@ Break or into 2:
 
 
 a(b*c|c*d)
+https://stackoverflow.com/questions/32663398/algorithm-for-regular-expressions-combinations-on-or
 https://cstheory.stackexchange.com/questions/8200/counting-words-accepted-by-a-regular-grammar
 https://medium.freecodecamp.org/state-machines-basics-of-computer-science-d42855debc66
 https://www.gamedev.net/articles/programming/general-and-gameplay-programming/finite-state-machines-and-regular-expressions-r3176/
