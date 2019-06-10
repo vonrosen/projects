@@ -23,14 +23,16 @@ public class CountStrings {
 //		((ab)|(ba)) 2
 //		((a|b)*) 5
 //		((a*)(b(a*))) 100
+		
+		String word = "b";
 
-		ParseNode tree = regexToExpressionTree("((a*)(b(a*)))");
-		//ParseNode tree = regexToExpressionTree("(a|b)");
+		//ParseNode tree = regexToExpressionTree("((a*)(b(a*)))");
+		ParseNode tree = regexToExpressionTree("((ab)|(ba))");
 		//ParseNode tree = regexToExpressionTree("(a|b)*abb");
 		//ParseNode tree = regexToExpressionTree("((bb)|((((((aa)|(b|b))|(a|b))|(((a|a)|b)|((((ab)a)*)((b|b)*))))|(((ab)(((aa)a)|b))b))*))");
 		//ParseNode tree = regexToExpressionTree("((a|b)|(a|b)*)");
 
-		int length = 100;
+		int length = 2;
 
 		printTree(tree, 0);
 
@@ -45,25 +47,39 @@ public class CountStrings {
 		System.out.println("dfa initial " + dfa.initial);
 		System.out.println("dfa transtable size " + dfa.transTable.size());
 		System.out.println("dfa final states size " + dfa.finalStates.size());
+		System.out.println("Final states: ");
+		System.out.println(dfa.finalStates);
 
 		//System.out.println(dfa.simulate("b"));
 
 		//double a = 1267650600228229401496703205375D;
 
 		//System.out.println("dfa transfer matrix:");
-		//BigInteger [][] matrix = dfa.probabilityMatrixBigInteger();
-//		for (int i = 0; i < matrix.length; ++i) {
-//			for (int j = 0; j < matrix.length; ++j) {
-//				System.out.println(matrix[i][j]);
-//			}
-//		}
+		BigInteger [][] matrix = dfa.probabilityMatrixBigInteger();
+		System.out.println("prob matrix: ");
+		for (int i = 0; i < matrix.length; ++i) {
+			for (int j = 0; j < matrix.length; ++j) {
+				System.out.print(matrix[i][j]);
+				System.out.print(" ");
+			}
+			System.out.println("");
+		}
 
-		//BigInteger [][] productMatrix = matrixPower(matrix, 100);
+		BigInteger [][] productMatrix = matrixPower(matrix, length);
+		System.out.println("exponentiated prob matrix: ");
+		for (int i = 0; i < productMatrix.length; ++i) {
+			for (int j = 0; j < productMatrix.length; ++j) {
+				System.out.print(productMatrix[i][j]);
+				System.out.print(" ");
+			}
+			System.out.println("");
+		}		
 //		System.out.println(productMatrix[0][2]);
 		//long sumAcceptingStates = sumAcceptingStates(productMatrix, dfa);
 		//long [][] productMatrix = multiplyEntriesInMatrix(matrix, length);
 		//BigInteger sumAcceptingStates = sumAcceptingStates(productMatrix, dfa);
-		//System.out.println(sumAcceptingStates.toString());
+		BigInteger sumAcceptingStates = sumAcceptingStates2(productMatrix, dfa);
+		System.out.println(sumAcceptingStates.toString());
 
 		//System.out.println(sumAcceptingStates % (Math.pow(10, 9) + 7));
 
@@ -80,7 +96,8 @@ public class CountStrings {
 //
 //		double [][] p = matrixPower(m1, 10);
 //		System.out.println(p[2][1]);
-		System.out.println(dfa.simulate("aa"));
+		//ParseNode tree = regexToExpressionTree("((a*)(b(a*)))");
+		System.out.println(dfa.simulate(word));
 	}
 
 	private static long[][] multiplyEntriesInMatrix(long[][] matrix, long value) {
@@ -96,6 +113,16 @@ public class CountStrings {
 		return product;
 	}
 
+	private static BigInteger sumAcceptingStates2(BigInteger [][] productMatrix, DFA dfa) {
+		BigInteger sum = new BigInteger("0");
+				
+		for (int finalState: dfa.finalStates) {
+			sum = sum.add(productMatrix[dfa.initial][finalState]);
+		}
+
+		return sum;		
+	}
+	
 	private static BigInteger sumAcceptingStates(BigInteger [][] productMatrix, DFA dfa) {
 		BigInteger sum = new BigInteger("0");
 
@@ -104,6 +131,8 @@ public class CountStrings {
 			int toState = dfa.transTable.get(tran);
 
 			if (isStateInSet(dfa.finalStates, toState)) {
+				System.out.println("final state from: " + fromState);
+				System.out.println("final state to: " + toState);				
 				sum = sum.add(productMatrix[fromState][toState]);
 			}
 		}
@@ -592,11 +621,10 @@ public class CountStrings {
 		for (int i = 0; i < regex.length(); ++i) {
 			char c = regex.charAt(i);
 
-			printExpressionStack();
+			//printExpressionStack();
 
 			if (c == '(') {
-				ParseNode node = new ParseNode();
-				expressionStack.push(node);
+				continue;
 			}
 			else if (c == ')') {
 				if (i + 1 < regex.length() &&
@@ -635,39 +663,51 @@ public class CountStrings {
 				node.type = ParseNode.Type.CHAR;
 				node.data = Character.toString(c);
 
-				ParseNode firstNodeNonNull = getFirstNonNullNode();
-
 				//if next char is * create a star node and advance counter by 1
 				if (i < regex.length() - 1) {
 					if (regex.charAt(i + 1) == '*') {
 						ParseNode starNode = new ParseNode();
 						starNode.type = ParseNode.Type.STAR;
 						starNode.left = node;
-						expressionStack.push(starNode);
-						++i;
 
-						if (firstNodeNonNull == null) {
-							continue;
+						if (expressionStack.isEmpty()) {
+							expressionStack.push(starNode);	
 						}
+						else {
+							ParseNode lastNode = expressionStack.pop();
+							ParseNode node2 = new ParseNode();
+							node2.type = ParseNode.Type.CONCAT;
+							node2.right = starNode;
+							node2.left = lastNode;
+							expressionStack.push(node2);							
+						}
+						
+						++i;
+						continue;
+					}
+					else if (regex.charAt(i + 1) != ')') {
+						
 					}
 				}
 
-				firstNodeNonNull = getFirstNonNullNode();
-
-				if (firstNodeNonNull == null) {
-					expressionStack.push(node);
+				ParseNode lastNode = new ParseNode();
+				if (!expressionStack.isEmpty()) {
+					lastNode = expressionStack.pop();
 				}
-				else if (ParseNode.Type.ALT.equals(firstNodeNonNull.type)) {
-					ParseNode last = expressionStack.pop();
-					last.right = node;
-					expressionStack.push(last);
+				
+				if (ParseNode.Type.ALT.equals(lastNode.type)) {
+					lastNode.right = node;
+					expressionStack.push(lastNode);
 				}
-				else {
+				else if (lastNode.type != null) {
 					ParseNode node2 = new ParseNode();
 					node2.type = ParseNode.Type.CONCAT;
 					node2.right = node;
-					node2.left = firstNodeNonNull;
-					expressionStack.push(node2);
+					node2.left = lastNode;
+					expressionStack.push(node2);				
+				}
+				else {
+					expressionStack.push(node);
 				}
 			}
 		}
@@ -676,16 +716,16 @@ public class CountStrings {
 	}
 
 
-	private static ParseNode getFirstNonNullNode() {
-		ParseNode last = null;
-		for (ParseNode node : expressionStack) {
-			if (node.type != null) {
-				last = node;
-			}
-		}
-
-		return last;
-	}
+//	private static ParseNode getFirstNonNullNode() {
+//		ParseNode last = null;
+//		for (ParseNode node : expressionStack) {
+//			if (node.type != null) {
+//				last = node;
+//			}
+//		}
+//
+//		return last;
+//	}
 
 	/*
 	 * Complete the countStrings function below.
