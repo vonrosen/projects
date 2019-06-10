@@ -1,5 +1,6 @@
 package org.hunter.hackerrank;
 
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -49,18 +50,20 @@ public class CountStrings {
 
 		//double a = 1267650600228229401496703205375D;
 
-		System.out.println("dfa transfer matrix:");
-		long [][] matrix = dfa.probabilityMatrix();
+		//System.out.println("dfa transfer matrix:");
+		//BigInteger [][] matrix = dfa.probabilityMatrixBigInteger();
 //		for (int i = 0; i < matrix.length; ++i) {
 //			for (int j = 0; j < matrix.length; ++j) {
 //				System.out.println(matrix[i][j]);
 //			}
 //		}
 
-		long [][] productMatrix = matrixPower(matrix, 100);
-		System.out.println(productMatrix[0][2]);
+		//BigInteger [][] productMatrix = matrixPower(matrix, 100);
+//		System.out.println(productMatrix[0][2]);
 		//long sumAcceptingStates = sumAcceptingStates(productMatrix, dfa);
-		//System.out.println(sumAcceptingStates);
+		//long [][] productMatrix = multiplyEntriesInMatrix(matrix, length);
+		//BigInteger sumAcceptingStates = sumAcceptingStates(productMatrix, dfa);
+		//System.out.println(sumAcceptingStates.toString());
 
 		//System.out.println(sumAcceptingStates % (Math.pow(10, 9) + 7));
 
@@ -77,6 +80,35 @@ public class CountStrings {
 //
 //		double [][] p = matrixPower(m1, 10);
 //		System.out.println(p[2][1]);
+		System.out.println(dfa.simulate("aa"));
+	}
+
+	private static long[][] multiplyEntriesInMatrix(long[][] matrix, long value) {
+		long [][] product = new long[matrix.length][matrix.length];
+
+		for (int i = 0; i < matrix.length; ++i) {
+			for (int j = 0; j < matrix[i].length; ++j) {
+				product[i][j] = matrix[i][j];
+				product[i][j] *= value;
+			}
+		}
+
+		return product;
+	}
+
+	private static BigInteger sumAcceptingStates(BigInteger [][] productMatrix, DFA dfa) {
+		BigInteger sum = new BigInteger("0");
+
+		for (Transition tran : dfa.transTable.keySet()) {
+			int fromState = tran.state;
+			int toState = dfa.transTable.get(tran);
+
+			if (isStateInSet(dfa.finalStates, toState)) {
+				sum = sum.add(productMatrix[fromState][toState]);
+			}
+		}
+
+		return sum;
 	}
 
 	private static long sumAcceptingStates(long [][] productMatrix, DFA dfa) {
@@ -229,8 +261,8 @@ public class CountStrings {
 		return dfa;
 	}
 
-	private static long [][] matrixPower(long [][] matrix, int power) {
-		long [][] product = new long[matrix.length][matrix.length];
+	private static BigInteger [][] matrixPower(BigInteger [][] matrix, int power) {
+		BigInteger [][] product = new BigInteger[matrix.length][matrix.length];
 		for (int i = 0; i < product.length; ++i) {
 			for (int k = 0; k < product.length; ++k) {
 				product[i][k] = matrix[i][k];
@@ -244,14 +276,17 @@ public class CountStrings {
 		return product;
 	}
 
-	private static long [][] multiplyMatrices(long [][] matrix1, long [][] matrix2) {
-		long [][] product = new long[matrix1.length][matrix2.length];
+	private static BigInteger [][] multiplyMatrices(BigInteger [][] matrix1, BigInteger [][] matrix2) {
+		BigInteger [][] product = new BigInteger[matrix1.length][matrix2.length];
 
 		for (int i = 0; i < product.length; ++i) {
 			for (int j = 0; j < product.length; ++j) {
-				long sum = 0;
+				BigInteger sum = new BigInteger("0");
 				for (int ctr = 0; ctr < matrix1.length; ++ctr) {
-					sum += matrix1[i][ctr] * matrix2[ctr][j];
+					//sum += matrix1[i][ctr] * matrix2[ctr][j];
+
+					sum = matrix1[i][ctr].multiply(matrix2[ctr][j]).add(sum);
+
 				}
 
 				product[i][j] = sum;
@@ -266,6 +301,24 @@ public class CountStrings {
 		int initial = 0;
 		Set<Integer> finalStates = new HashSet<Integer>();
 		Map<Transition, Integer> transTable = new HashMap<Transition, Integer>();
+
+		BigInteger [][] probabilityMatrixBigInteger() {
+			BigInteger [][] matrix = new BigInteger[transTable.size()][transTable.size()];
+			for (int i = 0; i < matrix.length; ++i) {
+				for (int j = 0; j < matrix[i].length; ++j) {
+					matrix[i][j] = new BigInteger("0");
+				}
+			}
+
+			for (Transition tran : transTable.keySet()) {
+				int stateFrom = tran.state;
+				int stateTo = transTable.get(tran);
+
+				matrix[stateFrom][stateTo] = matrix[stateFrom][stateTo].add(new BigInteger("1"));
+			}
+
+			return matrix;
+		}
 
 		long [][] probabilityMatrix() {
 			long [][] matrix = new long[transTable.size()][transTable.size()];
@@ -522,15 +575,24 @@ public class CountStrings {
 		}
 	}
 
-	private static ParseNode regexToExpressionTree(String regex) {
-		ParseNode lastNode = null;
+	private static void printExpressionStack() {
+		for (ParseNode node: expressionStack) {
+			System.out.print(node.type);
+			System.out.print(" ");
+		}
 
+		System.out.println("endprint");
+	}
+
+	private static ParseNode regexToExpressionTree(String regex) {
 		//((a|b)|(a|b)*)
 		//((a|b)|(a|b))
 		//(a|b)*abb
 
 		for (int i = 0; i < regex.length(); ++i) {
 			char c = regex.charAt(i);
+
+			printExpressionStack();
 
 			if (c == '(') {
 				ParseNode node = new ParseNode();
@@ -540,7 +602,6 @@ public class CountStrings {
 				if (i + 1 < regex.length() &&
 						regex.charAt(i + 1) == ')' || i == regex.length() - 1) {
 
-					//null, null, alt, null
 					//search for unbalanced alt at same level and balance it
 					ParseNode lastUnbalancedAlt = null;
 					for (ParseNode node : expressionStack) {
@@ -574,10 +635,29 @@ public class CountStrings {
 				node.type = ParseNode.Type.CHAR;
 				node.data = Character.toString(c);
 
-				if (expressionStack.peek().type == null) {
+				ParseNode firstNodeNonNull = getFirstNonNullNode();
+
+				//if next char is * create a star node and advance counter by 1
+				if (i < regex.length() - 1) {
+					if (regex.charAt(i + 1) == '*') {
+						ParseNode starNode = new ParseNode();
+						starNode.type = ParseNode.Type.STAR;
+						starNode.left = node;
+						expressionStack.push(starNode);
+						++i;
+
+						if (firstNodeNonNull == null) {
+							continue;
+						}
+					}
+				}
+
+				firstNodeNonNull = getFirstNonNullNode();
+
+				if (firstNodeNonNull == null) {
 					expressionStack.push(node);
 				}
-				else if (expressionStack.peek().type.equals(ParseNode.Type.ALT)) {
+				else if (ParseNode.Type.ALT.equals(firstNodeNonNull.type)) {
 					ParseNode last = expressionStack.pop();
 					last.right = node;
 					expressionStack.push(last);
@@ -586,7 +666,7 @@ public class CountStrings {
 					ParseNode node2 = new ParseNode();
 					node2.type = ParseNode.Type.CONCAT;
 					node2.right = node;
-					node2.left = expressionStack.pop();
+					node2.left = firstNodeNonNull;
 					expressionStack.push(node2);
 				}
 			}
@@ -595,6 +675,17 @@ public class CountStrings {
 		return expressionStack.pop();
 	}
 
+
+	private static ParseNode getFirstNonNullNode() {
+		ParseNode last = null;
+		for (ParseNode node : expressionStack) {
+			if (node.type != null) {
+				last = node;
+			}
+		}
+
+		return last;
+	}
 
 	/*
 	 * Complete the countStrings function below.
