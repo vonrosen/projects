@@ -1,8 +1,10 @@
 package org.hunter.hackerrank;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
@@ -37,24 +39,26 @@ public class CountStrings {
 
 		printTree(tree, 0);
 
-		NFA nfa = expressionTreeToNFA(tree);
+//		NFA nfa = expressionTreeToNFA(tree);
+//
+//		System.out.println("nfa initial = " + nfa.initial);
+//		System.out.println("nfa last = " + nfa.last);
+//		System.out.println("nfa size = " + nfa.size);
+//
+//		DFA dfa = subsetConstruct(nfa);
+//
+//		System.out.println("dfa initial " + dfa.initial);
+//		System.out.println("dfa transtable size " + dfa.transTable.size());
+//		System.out.println("dfa final states size " + dfa.finalStates.size());
+//		System.out.println("Final states: ");
+//		System.out.println(dfa.finalStates);
+//
+//		BigInteger [][] matrix = dfa.probabilityMatrixBigInteger();
+//		BigInteger [][] productMatrix = matrixPower(matrix, length);
+//		BigInteger sumAcceptingStates = sumAcceptingStates2(productMatrix, dfa);
+//		System.out.println(sumAcceptingStates.mod(new BigInteger(new Long((long)Math.pow(10, 9) + 7).toString())));
 
-		System.out.println("nfa initial = " + nfa.initial);
-		System.out.println("nfa last = " + nfa.last);
-		System.out.println("nfa size = " + nfa.size);
 
-		DFA dfa = subsetConstruct(nfa);
-
-		System.out.println("dfa initial " + dfa.initial);
-		System.out.println("dfa transtable size " + dfa.transTable.size());
-		System.out.println("dfa final states size " + dfa.finalStates.size());
-		System.out.println("Final states: ");
-		System.out.println(dfa.finalStates);
-
-		BigInteger [][] matrix = dfa.probabilityMatrixBigInteger();
-		BigInteger [][] productMatrix = matrixPower(matrix, length);
-		BigInteger sumAcceptingStates = sumAcceptingStates2(productMatrix, dfa);
-		System.out.println(sumAcceptingStates.mod(new BigInteger(new Long((long)Math.pow(10, 9) + 7).toString())));
 
 
 //		BigInteger [][] test = new BigInteger[2][2];
@@ -664,6 +668,41 @@ public class CountStrings {
 		System.out.println("endprint");
 	}
 
+	private static ParseNode regexToExpressionTree2(String regex) {
+
+		if (!regex.startsWith("(")) {
+			ParseNode node = new ParseNode();
+			node.type = ParseNode.Type.CHAR;
+			node.data = regex;
+
+			ParseNode concatNode = new ParseNode();
+			concatNode.type = ParseNode.Type.CONCAT;
+			concatNode.left = node;
+
+			return concatNode;
+		}
+
+		List<ParseNode> leaves = new ArrayList<ParseNode>();
+		String rewrittenRegex = regex;
+
+		while (!rewrittenRegex.startsWith("(")) {
+			for (int i = 0; i < regex.length(); ++i) {
+				char c = regex.charAt(i);
+
+				if (startLeaf(i)) {
+					ParseNode leaf = createLeaf(i);
+					rewrittenRegex = rewriteRegex(rewrittenRegex(i));
+					leaves.add(leaf);
+				}
+			}
+		}
+
+
+
+
+		return expressionStack.pop();
+	}
+
 	private static ParseNode regexToExpressionTree(String regex) {
 		//((a|b)|(a|b)*)
 		//((a|b)|(a|b))
@@ -675,24 +714,19 @@ public class CountStrings {
 			//printExpressionStack();
 
 			if (c == '(') {
-				continue;
-			}
-			else if (c == ')') {
-				if (i + 1 < regex.length() &&
-						regex.charAt(i + 1) == ')' || i == regex.length() - 1) {
-
-					//search for unbalanced alt at same level and balance it
-					ParseNode lastUnbalancedAlt = null;
-					for (ParseNode node : expressionStack) {
-						if (node.type != null && node.type.equals(ParseNode.Type.ALT) && node.right == null) {
-							lastUnbalancedAlt = node;
-						}
+				if (expressionStack.isEmpty()) {
+					continue;
+				}
+				else {
+					ParseNode lastNode = expressionStack.pop();
+					if (lastNode.type.equals(ParseNode.Type.ALT) && lastNode.right == null) {
+						continue;
 					}
-
-					if (lastUnbalancedAlt != null) {
-						ParseNode last = expressionStack.pop();
-						lastUnbalancedAlt.right = last;
-						expressionStack.push(lastUnbalancedAlt);
+					else {
+						ParseNode concatNode = new ParseNode();
+						concatNode.type = ParseNode.Type.CONCAT;
+						concatNode.left = lastNode;
+						expressionStack.push(concatNode);
 					}
 				}
 			}
@@ -714,55 +748,14 @@ public class CountStrings {
 				node.type = ParseNode.Type.CHAR;
 				node.data = Character.toString(c);
 
-				//if next char is * create a star node and advance counter by 1
-				if (i < regex.length() - 1) {
-					if (regex.charAt(i + 1) == '*') {
-						ParseNode starNode = new ParseNode();
-						starNode.type = ParseNode.Type.STAR;
-						starNode.left = node;
-
-						if (expressionStack.isEmpty()) {
-							expressionStack.push(starNode);
-						}
-						else {
-							ParseNode lastNode = expressionStack.pop();
-							ParseNode node2 = new ParseNode();
-							node2.type = ParseNode.Type.CONCAT;
-							node2.right = starNode;
-							node2.left = lastNode;
-							expressionStack.push(node2);
-						}
-
-						++i;
-						continue;
-					}
-					else if (regex.charAt(i + 1) == '|') {
-						ParseNode altNode = new ParseNode();
-						altNode.type = ParseNode.Type.ALT;
-						altNode.left = node;
-						expressionStack.push(altNode);
-					}
-				}
-
-				ParseNode lastNode = new ParseNode();
+				ParseNode lastNode = null;
 				if (!expressionStack.isEmpty()) {
 					lastNode = expressionStack.pop();
 				}
 
-				if (ParseNode.Type.ALT.equals(lastNode.type)) {
-					lastNode.right = node;
-					expressionStack.push(lastNode);
-				}
-				else if (lastNode.type != null) {
-					ParseNode node2 = new ParseNode();
-					node2.type = ParseNode.Type.CONCAT;
-					node2.right = node;
-					node2.left = lastNode;
-					expressionStack.push(node2);
-				}
-				else {
-					expressionStack.push(node);
-				}
+
+
+				//handle next character if it exists
 			}
 		}
 
