@@ -23,16 +23,17 @@ public class CountStrings {
 //		((ab)|(ba)) 2
 //		((a|b)*) 5
 //		((a*)(b(a*))) 100
-		
+		// (a(((b|(a(ba)))*)b)) 18
+
 		String word = "b";
 
 		//ParseNode tree = regexToExpressionTree("((a*)(b(a*)))");
-		ParseNode tree = regexToExpressionTree("((ab)|(ba))");
+		//ParseNode tree = regexToExpressionTree("((a|b)*)");
 		//ParseNode tree = regexToExpressionTree("(a|b)*abb");
 		//ParseNode tree = regexToExpressionTree("((bb)|((((((aa)|(b|b))|(a|b))|(((a|a)|b)|((((ab)a)*)((b|b)*))))|(((ab)(((aa)a)|b))b))*))");
-		//ParseNode tree = regexToExpressionTree("((a|b)|(a|b)*)");
+		ParseNode tree = regexToExpressionTree("(a(((b|(a(ba)))*)b))");
 
-		int length = 2;
+		long length = 18;
 
 		printTree(tree, 0);
 
@@ -50,36 +51,53 @@ public class CountStrings {
 		System.out.println("Final states: ");
 		System.out.println(dfa.finalStates);
 
-		//System.out.println(dfa.simulate("b"));
-
-		//double a = 1267650600228229401496703205375D;
-
-		//System.out.println("dfa transfer matrix:");
 		BigInteger [][] matrix = dfa.probabilityMatrixBigInteger();
-		System.out.println("prob matrix: ");
-		for (int i = 0; i < matrix.length; ++i) {
-			for (int j = 0; j < matrix.length; ++j) {
-				System.out.print(matrix[i][j]);
-				System.out.print(" ");
-			}
-			System.out.println("");
-		}
-
 		BigInteger [][] productMatrix = matrixPower(matrix, length);
-		System.out.println("exponentiated prob matrix: ");
-		for (int i = 0; i < productMatrix.length; ++i) {
-			for (int j = 0; j < productMatrix.length; ++j) {
-				System.out.print(productMatrix[i][j]);
-				System.out.print(" ");
-			}
-			System.out.println("");
-		}		
+		BigInteger sumAcceptingStates = sumAcceptingStates2(productMatrix, dfa);
+		System.out.println(sumAcceptingStates.mod(new BigInteger(new Long((long)Math.pow(10, 9) + 7).toString())));
+
+
+//		BigInteger [][] test = new BigInteger[2][2];
+//		test[0][0] = new BigInteger("3");
+//		test[0][1] = new BigInteger("2");
+//		test[1][0] = new BigInteger("1");
+//		test[1][1] = new BigInteger("4");
+//		System.out.println("before");
+//		for (int i = 0; i < test.length; ++i) {
+//			for (int j = 0; j < test.length; ++j) {
+//				System.out.print(test[i][j]);
+//				System.out.print(" ");
+//			}
+//			System.out.println("");
+//		}
+//
+//		BigInteger [][] result = matrixPower(test, 7);
+//		System.out.println("after");
+//		for (int i = 0; i < result.length; ++i) {
+//			for (int j = 0; j < result.length; ++j) {
+//				System.out.print(result[i][j]);
+//				System.out.print(" ");
+//			}
+//			System.out.println("");
+//		}
+//
+//		findNonFractionalLog(length);
+
+
+//		System.out.println(Math.pow(2, 10.3));
+
+//		System.out.println("exponentiated prob matrix: ");
+//		for (int i = 0; i < productMatrix.length; ++i) {
+//			for (int j = 0; j < productMatrix.length; ++j) {
+//				System.out.print(productMatrix[i][j]);
+//				System.out.print(" ");
+//			}
+//			System.out.println("");
+//		}
 //		System.out.println(productMatrix[0][2]);
 		//long sumAcceptingStates = sumAcceptingStates(productMatrix, dfa);
 		//long [][] productMatrix = multiplyEntriesInMatrix(matrix, length);
 		//BigInteger sumAcceptingStates = sumAcceptingStates(productMatrix, dfa);
-		BigInteger sumAcceptingStates = sumAcceptingStates2(productMatrix, dfa);
-		System.out.println(sumAcceptingStates.toString());
 
 		//System.out.println(sumAcceptingStates % (Math.pow(10, 9) + 7));
 
@@ -97,7 +115,43 @@ public class CountStrings {
 //		double [][] p = matrixPower(m1, 10);
 //		System.out.println(p[2][1]);
 		//ParseNode tree = regexToExpressionTree("((a*)(b(a*)))");
-		System.out.println(dfa.simulate(word));
+//		System.out.println(dfa.simulate(word));
+	}
+
+	private static void findNonFractionalLog(long l) {
+		long x = 200;
+		if (x % 1 == 0) {
+			System.out.println("good");
+		}
+
+		long copyL = l;
+		while (copyL > (l - 100)) {
+			for (int base = 2; base < 100; ++base) {
+				double log = Math.log(l) / Math.log(base);
+
+				if (log % 1 == 0) {
+					System.out.println("here!");
+					System.out.println(log);
+				}
+
+				copyL--;
+			}
+		}
+
+
+
+
+
+//		double diff = l;
+//		double log = Math.log(diff) / Math.log(2);
+//		while (log % 1 > 0) {
+//
+//			double roundedDownLog = Math.floor(log);
+//			diff = diff - (long)Math.pow(2, roundedDownLog);
+//
+//			log = Math.log(diff) / Math.log(2);
+//			System.out.println(log);
+//		}
 	}
 
 	private static long[][] multiplyEntriesInMatrix(long[][] matrix, long value) {
@@ -115,14 +169,14 @@ public class CountStrings {
 
 	private static BigInteger sumAcceptingStates2(BigInteger [][] productMatrix, DFA dfa) {
 		BigInteger sum = new BigInteger("0");
-				
+
 		for (int finalState: dfa.finalStates) {
 			sum = sum.add(productMatrix[dfa.initial][finalState]);
 		}
 
-		return sum;		
+		return sum;
 	}
-	
+
 	private static BigInteger sumAcceptingStates(BigInteger [][] productMatrix, DFA dfa) {
 		BigInteger sum = new BigInteger("0");
 
@@ -132,7 +186,7 @@ public class CountStrings {
 
 			if (isStateInSet(dfa.finalStates, toState)) {
 				System.out.println("final state from: " + fromState);
-				System.out.println("final state to: " + toState);				
+				System.out.println("final state to: " + toState);
 				sum = sum.add(productMatrix[fromState][toState]);
 			}
 		}
@@ -290,7 +344,7 @@ public class CountStrings {
 		return dfa;
 	}
 
-	private static BigInteger [][] matrixPower(BigInteger [][] matrix, int power) {
+	private static BigInteger [][] matrixPower(BigInteger [][] matrix, long power) {
 		BigInteger [][] product = new BigInteger[matrix.length][matrix.length];
 		for (int i = 0; i < product.length; ++i) {
 			for (int k = 0; k < product.length; ++k) {
@@ -298,7 +352,7 @@ public class CountStrings {
 			}
 		}
 
-		for (int i = 0; i < power - 1; ++i) {
+		for (long i = 0; i < power - 1; ++i) {
 			product = multiplyMatrices(matrix, product);
 		}
 
@@ -312,10 +366,7 @@ public class CountStrings {
 			for (int j = 0; j < product.length; ++j) {
 				BigInteger sum = new BigInteger("0");
 				for (int ctr = 0; ctr < matrix1.length; ++ctr) {
-					//sum += matrix1[i][ctr] * matrix2[ctr][j];
-
 					sum = matrix1[i][ctr].multiply(matrix2[ctr][j]).add(sum);
-
 				}
 
 				product[i][j] = sum;
@@ -671,7 +722,7 @@ public class CountStrings {
 						starNode.left = node;
 
 						if (expressionStack.isEmpty()) {
-							expressionStack.push(starNode);	
+							expressionStack.push(starNode);
 						}
 						else {
 							ParseNode lastNode = expressionStack.pop();
@@ -679,14 +730,17 @@ public class CountStrings {
 							node2.type = ParseNode.Type.CONCAT;
 							node2.right = starNode;
 							node2.left = lastNode;
-							expressionStack.push(node2);							
+							expressionStack.push(node2);
 						}
-						
+
 						++i;
 						continue;
 					}
-					else if (regex.charAt(i + 1) != ')') {
-						
+					else if (regex.charAt(i + 1) == '|') {
+						ParseNode altNode = new ParseNode();
+						altNode.type = ParseNode.Type.ALT;
+						altNode.left = node;
+						expressionStack.push(altNode);
 					}
 				}
 
@@ -694,7 +748,7 @@ public class CountStrings {
 				if (!expressionStack.isEmpty()) {
 					lastNode = expressionStack.pop();
 				}
-				
+
 				if (ParseNode.Type.ALT.equals(lastNode.type)) {
 					lastNode.right = node;
 					expressionStack.push(lastNode);
@@ -704,7 +758,7 @@ public class CountStrings {
 					node2.type = ParseNode.Type.CONCAT;
 					node2.right = node;
 					node2.left = lastNode;
-					expressionStack.push(node2);				
+					expressionStack.push(node2);
 				}
 				else {
 					expressionStack.push(node);
