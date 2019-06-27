@@ -78,6 +78,9 @@ https://github.com/eliben/code-for-blog/tree/master/2009/regex_fsm
 http://pi.math.cornell.edu/~mec/Winter2009/RalucaRemus/Lecture2/lecture2.html
 https://math.stackexchange.com/questions/2969076/how-to-determine-the-number-of-possible-combinations-of-letters-that-contain-a-d
 
+
+(a(((b|(a(ba)))*)b))
+
 create tree
 
 

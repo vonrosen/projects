@@ -1,10 +1,8 @@
 package org.hunter.hackerrank;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
@@ -21,42 +19,56 @@ public class CountStrings {
 	private static String regex = null;
 
 	public static void main(String [] args) {
-
 //		((ab)|(ba)) 2
 //		((a|b)*) 5
 //		((a*)(b(a*))) 100
 		// (a(((b|(a(ba)))*)b)) 18
 
+//		3
+//		((ab)|(ba)) 2
+//		((a|b)*) 5
+//		((a*)(b(a*))) 100
+
 		String word = "b";
+		//String regex = "a";
+		//String regex = "((a|b)*)";
+		//String regex = "(a(((b|(a(ba)))*)b))";
+		//String regex = "((bb)|((((((aa)|(b|b))|(a|b))|(((a|a)|b)|((((ab)a)*)((b|b)*))))|(((ab)(((aa)a)|b))b))*))";
+		String regex = "((a|b)*)";
+		long length = 5;
 
 		//ParseNode tree = regexToExpressionTree("((a*)(b(a*)))");
 		//ParseNode tree = regexToExpressionTree("((a|b)*)");
 		//ParseNode tree = regexToExpressionTree("(a|b)*abb");
 		//ParseNode tree = regexToExpressionTree("((bb)|((((((aa)|(b|b))|(a|b))|(((a|a)|b)|((((ab)a)*)((b|b)*))))|(((ab)(((aa)a)|b))b))*))");
-		ParseNode tree = regexToExpressionTree("(a(((b|(a(ba)))*)b))");
+		//ParseNode tree = regexToExpressionTree("(a(((b|(a(ba)))*)b))", 0);
 
-		long length = 18;
+		if (!regex.contains("(")) {
+			regex = "(" + regex + ")";
+		}
+
+		ParseNode tree = regexToExpressionTree(regex);
 
 		printTree(tree, 0);
 
-//		NFA nfa = expressionTreeToNFA(tree);
+		NFA nfa = expressionTreeToNFA(tree);
+
+		System.out.println("nfa initial = " + nfa.initial);
+		System.out.println("nfa last = " + nfa.last);
+		System.out.println("nfa size = " + nfa.size);
+
+		DFA dfa = subsetConstruct(nfa);
 //
-//		System.out.println("nfa initial = " + nfa.initial);
-//		System.out.println("nfa last = " + nfa.last);
-//		System.out.println("nfa size = " + nfa.size);
-//
-//		DFA dfa = subsetConstruct(nfa);
-//
-//		System.out.println("dfa initial " + dfa.initial);
-//		System.out.println("dfa transtable size " + dfa.transTable.size());
-//		System.out.println("dfa final states size " + dfa.finalStates.size());
+		System.out.println("dfa initial " + dfa.initial);
+		System.out.println("dfa transtable size " + dfa.transTable.size());
+		System.out.println("dfa final states size " + dfa.finalStates.size());
 //		System.out.println("Final states: ");
 //		System.out.println(dfa.finalStates);
 //
-//		BigInteger [][] matrix = dfa.probabilityMatrixBigInteger();
-//		BigInteger [][] productMatrix = matrixPower(matrix, length);
-//		BigInteger sumAcceptingStates = sumAcceptingStates2(productMatrix, dfa);
-//		System.out.println(sumAcceptingStates.mod(new BigInteger(new Long((long)Math.pow(10, 9) + 7).toString())));
+		BigInteger [][] matrix = dfa.probabilityMatrixBigInteger();
+		BigInteger [][] productMatrix = matrixPower(matrix, length);
+		BigInteger sumAcceptingStates = sumAcceptingStates2(productMatrix, dfa);
+		System.out.println(sumAcceptingStates.mod(new BigInteger(new Long((long)Math.pow(10, 9) + 7).toString())));
 
 
 
@@ -668,98 +680,119 @@ public class CountStrings {
 		System.out.println("endprint");
 	}
 
-	private static ParseNode regexToExpressionTree2(String regex) {
+//	private static ParseNode regexToExpressionTree2(String regex) {
+//
+//		if (!regex.startsWith("(")) {
+//			ParseNode node = new ParseNode();
+//			node.type = ParseNode.Type.CHAR;
+//			node.data = regex;
+//
+//			ParseNode concatNode = new ParseNode();
+//			concatNode.type = ParseNode.Type.CONCAT;
+//			concatNode.left = node;
+//
+//			return concatNode;
+//		}
+//
+//		List<ParseNode> leaves = new ArrayList<ParseNode>();
+//		String rewrittenRegex = regex;
+//
+//		while (!rewrittenRegex.startsWith("(")) {
+//			for (int i = 0; i < regex.length(); ++i) {
+//				char c = regex.charAt(i);
+//
+//				if (startLeaf(i)) {
+//					ParseNode leaf = createLeaf(i);
+//					rewrittenRegex = rewriteRegex(rewrittenRegex(i));
+//					leaves.add(leaf);
+//				}
+//			}
+//		}
+//
+//
+//
+//
+//		return expressionStack.pop();
+//	}
 
-		if (!regex.startsWith("(")) {
-			ParseNode node = new ParseNode();
-			node.type = ParseNode.Type.CHAR;
-			node.data = regex;
-
-			ParseNode concatNode = new ParseNode();
-			concatNode.type = ParseNode.Type.CONCAT;
-			concatNode.left = node;
-
-			return concatNode;
-		}
-
-		List<ParseNode> leaves = new ArrayList<ParseNode>();
-		String rewrittenRegex = regex;
-
-		while (!rewrittenRegex.startsWith("(")) {
-			for (int i = 0; i < regex.length(); ++i) {
-				char c = regex.charAt(i);
-
-				if (startLeaf(i)) {
-					ParseNode leaf = createLeaf(i);
-					rewrittenRegex = rewriteRegex(rewrittenRegex(i));
-					leaves.add(leaf);
-				}
-			}
-		}
-
-
-
-
-		return expressionStack.pop();
-	}
+	static int currentPos = 0;
 
 	private static ParseNode regexToExpressionTree(String regex) {
 		//((a|b)|(a|b)*)
 		//((a|b)|(a|b))
 		//(a|b)*abb
+		//((a|b)*)
 
-		for (int i = 0; i < regex.length(); ++i) {
+		Stack<ParseNode> nodes = new Stack<ParseNode>();
+		for (int i = currentPos; i < regex.length(); ++i) {
 			char c = regex.charAt(i);
 
-			//printExpressionStack();
-
 			if (c == '(') {
-				if (expressionStack.isEmpty()) {
-					continue;
-				}
-				else {
-					ParseNode lastNode = expressionStack.pop();
-					if (lastNode.type.equals(ParseNode.Type.ALT) && lastNode.right == null) {
-						continue;
-					}
-					else {
+				currentPos = i + 1;
+				nodes.push(regexToExpressionTree(regex));
+				i = currentPos;
+			}
+			else if (c == ')') {
+				currentPos = i;
+				ParseNode last = null;
+
+				if (nodes.size() == 1) {
+					last = nodes.pop();
+
+					if (last.type.equals(ParseNode.Type.CHAR)) {
 						ParseNode concatNode = new ParseNode();
 						concatNode.type = ParseNode.Type.CONCAT;
-						concatNode.left = lastNode;
-						expressionStack.push(concatNode);
+						concatNode.right = last;
+						return concatNode;
+					}
+					else {
+						return last;
 					}
 				}
-			}
-			else if (c == '|') {
-				ParseNode node = new ParseNode();
-				node.type = ParseNode.Type.ALT;
-				node.left = expressionStack.pop();
-				expressionStack.push(node);
-			}
-			else if (c == '*') {
-				ParseNode node = new ParseNode();
-				node.type = ParseNode.Type.STAR;
-				node.left = expressionStack.pop();
-				expressionStack.push(node);
-			}
-			else {
-				//char data - leaf node
-				ParseNode node = new ParseNode();
-				node.type = ParseNode.Type.CHAR;
-				node.data = Character.toString(c);
 
-				ParseNode lastNode = null;
-				if (!expressionStack.isEmpty()) {
-					lastNode = expressionStack.pop();
+				while (!nodes.empty()) {
+					ParseNode current = nodes.pop();
+					if (nodes.empty()) {
+						if (current.type.equals(ParseNode.Type.ALT)) {
+							current.right = last;
+							return current;
+						}
+						else {
+							ParseNode concatNode = new ParseNode();
+							concatNode.type = ParseNode.Type.CONCAT;
+							concatNode.right = last;
+							concatNode.left = current;
+							return concatNode;
+						}
+					}
+					else {
+						last = current;
+					}
 				}
 
-
-
-				//handle next character if it exists
+				return nodes.pop();
+			}
+			else if (c == '|') {
+				ParseNode altNode = new ParseNode();
+				altNode.type = ParseNode.Type.ALT;
+				altNode.left = nodes.pop();
+				nodes.push(altNode);
+			}
+			else if (c == '*') {
+				ParseNode starNode = new ParseNode();
+				starNode.type = ParseNode.Type.STAR;
+				starNode.left = nodes.pop();
+				nodes.push(starNode);
+			}
+			else {
+				ParseNode charNode = new ParseNode();
+				charNode.type = ParseNode.Type.CHAR;
+				charNode.data = Character.toString(c);
+				nodes.push(charNode);
 			}
 		}
 
-		return expressionStack.pop();
+		return nodes.pop();
 	}
 
 
