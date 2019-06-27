@@ -35,8 +35,10 @@ public class CountStrings {
 		//String regex = "(a(((b|(a(ba)))*)b))";
 		//String regex = "((bb)|((((((aa)|(b|b))|(a|b))|(((a|a)|b)|((((ab)a)*)((b|b)*))))|(((ab)(((aa)a)|b))b))*))";
 		//String regex = "((a|b)*)";
-		String regex = "(a(((b|(a(ba)))*)b))";
-		long length = 18;
+		//String regex = "(a(((b|(a(ba)))*)b))";
+		String regex = "(b(((((a|(b|a))*)|(((((a|(a*))|a)|(b|((a|a)*)))|(a*))|(a|a)))*)*))";
+		long length = 502014773;
+		//long length = 18;
 
 		//ParseNode tree = regexToExpressionTree("((a*)(b(a*)))");
 		//ParseNode tree = regexToExpressionTree("((a|b)*)");
