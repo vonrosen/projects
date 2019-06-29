@@ -12,11 +12,72 @@ import java.util.Stack;
 import java.util.regex.Pattern;
 
 public class CountStrings {
-	
+
+	private static BigInteger [][] createIdentityMatrix(int width, int height) {
+		BigInteger [][] matrix = new BigInteger[width][height];
+
+		for (int i = 0; i < width; ++i) {
+			for (int j = 0; j < height; ++j) {
+				if (i == j) {
+					matrix[i][j] = new BigInteger("1");
+				}
+				else {
+					matrix[i][j] = new BigInteger("0");
+				}
+			}
+		}
+
+		return matrix;
+	}
+
+	private static long modBy = 1000000007L;
+
+	private static BigInteger [][] matrixPower3(BigInteger [][] matrix, long power) {
+		BigInteger [][] result = createIdentityMatrix(matrix.length, matrix.length);
+
+		while (power > 0) {
+			if (power % 2 == 0) {
+				power /= 2;
+				matrix = multiplyMatrices(matrix, matrix);
+			}
+			else {
+				power--;
+				result = multiplyMatrices(matrix, result);
+				power /= 2;
+				matrix = multiplyMatrices(matrix, matrix);
+			}
+
+//			System.out.println("p: " + power);
+		}
+
+		return result;
+	}
+
+	private static long pow(long base, long power) {
+		long result = 1;
+
+		while (power > 0) {
+			if (power % 2 == 0) {
+				power /= 2;
+				base *= base;
+			}
+			else {
+				power--;
+				result *= base;
+				power /= 2;
+				base *= base;
+			}
+
+			System.out.println("p: " + power);
+		}
+
+		return result;
+	}
+
 	private static Set<Long> findPowersOfTwo(long value) {
 		Set<Long> values = new HashSet<Long>();
 		double diff = value;
-		double log = Math.floor(Math.log(value)/Math.log(2));	
+		double log = Math.floor(Math.log(value)/Math.log(2));
 		while (true) {
 			//System.out.println(log);
 			if (log == 0) {
@@ -33,7 +94,7 @@ public class CountStrings {
 			//System.out.println(log);
 
 		}
-		
+
 		return values;
 	}
 
@@ -44,11 +105,12 @@ public class CountStrings {
 	private static long stringCount;
 	private static String regex = null;
 
-	public static void main(String [] args) {		
+	public static void main(String [] args) {
 //		((ab)|(ba)) 2
 //		((a|b)*) 5
 //		((a*)(b(a*))) 100
 		// (a(((b|(a(ba)))*)b)) 18
+		//(b(((((a|(b|a))*)|(((((a|(a*))|a)|(b|((a|a)*)))|(a*))|(a|a)))*)*)) 502014773
 
 //		3
 //		((ab)|(ba)) 2
@@ -63,11 +125,19 @@ public class CountStrings {
 		//String regex = "((a|b)*)";
 		//String regex = "(a(((b|(a(ba)))*)b))";
 		//String regex = "(b(((((a|(b|a))*)|(((((a|(a*))|a)|(b|((a|a)*)))|(a*))|(a|a)))*)*))";
-		String regex = "((a*)(b(a*)))";
+		//String regex = "((a*)(b(a*)))";
+		//String regex = "(b(((((a|(b|a))*)|(((((a|(a*))|a)|(b|((a|a)*)))|(a*))|(a|a)))*)*))";
+		String regex = "((bb)|((((((aa)|(b|b))|(a|b))|(((a|a)|b)|((((ab)a)*)((b|b)*))))|(((ab)(((aa)a)|b))b))*))";
 //		long length = 502014773;
-		long length = 100;
-		//long length = 18;
-		
+		long length = 653338565;
+		//long length = 100;
+
+		//919464569
+		//919464569
+
+		//487453258
+		//487453258
+
 		//System.out.println(findPowersOfTwo(502014773));
 
 		//ParseNode tree = regexToExpressionTree("((a*)(b(a*)))");
@@ -79,38 +149,43 @@ public class CountStrings {
 		if (!regex.contains("(")) {
 			regex = "(" + regex + ")";
 		}
-		
-		
+
+
 		BigInteger [][] m = new BigInteger[2][2];
 		m[0][0] = new BigInteger("1");
 		m[0][1] = new BigInteger("2");
 		m[1][0] = new BigInteger("3");
 		m[1][1] = new BigInteger("4");
-		
-		printMatrix(matrixPower2(m, 9));
 
-//		ParseNode tree = regexToExpressionTree(regex);
-//
-//		printTree(tree, 0);
-//
-//		NFA nfa = expressionTreeToNFA(tree);
-//
-//		System.out.println("nfa initial = " + nfa.initial);
-//		System.out.println("nfa last = " + nfa.last);
-//		System.out.println("nfa size = " + nfa.size);
-//
-//		DFA dfa = subsetConstruct(nfa);
-//
-//		System.out.println("dfa initial " + dfa.initial);
-//		System.out.println("dfa transtable size " + dfa.transTable.size());
-//		System.out.println("dfa final states size " + dfa.finalStates.size());
-//		BigInteger [][] matrix = dfa.probabilityMatrixBigInteger();
-//		BigInteger [][] productMatrix = matrixPower2(matrix, length);
-//		
-//		printMatrix(productMatrix);
-//		
-//		BigInteger sumAcceptingStates = sumAcceptingStates2(productMatrix, dfa);
-//		System.out.println(sumAcceptingStates.mod(new BigInteger(new Long((long)Math.pow(10, 9) + 7).toString())));
+
+		//System.out.println(pow(2, 502014773));
+
+//		printMatrix(m);
+//		System.out.println("");
+//		printMatrix(matrixPower3(m, 502014773));
+
+		ParseNode tree = regexToExpressionTree(regex);
+
+		printTree(tree, 0);
+
+		NFA nfa = expressionTreeToNFA(tree);
+
+		System.out.println("nfa initial = " + nfa.initial);
+		System.out.println("nfa last = " + nfa.last);
+		System.out.println("nfa size = " + nfa.size);
+
+		DFA dfa = subsetConstruct(nfa);
+
+		System.out.println("dfa initial " + dfa.initial);
+		System.out.println("dfa transtable size " + dfa.transTable.size());
+		System.out.println("dfa final states size " + dfa.finalStates.size());
+		BigInteger [][] matrix = dfa.probabilityMatrixBigInteger();
+		BigInteger [][] productMatrix = matrixPower3(matrix, length);
+
+		printMatrix(productMatrix);
+
+		BigInteger sumAcceptingStates = sumAcceptingStates2(productMatrix, dfa);
+		System.out.println(sumAcceptingStates.mod(new BigInteger(new Long((long)Math.pow(10, 9) + 7).toString())));
 	}
 
 	private static void printMatrix(BigInteger [][] matrix) {
@@ -119,13 +194,11 @@ public class CountStrings {
 				System.out.print(matrix[i][j]);
 				System.out.print(" ");
 			}
-			
+
 			System.out.println("");
 		}
-		
-		System.out.println("done print matrix");
 	}
-	
+
 	private static void findNonFractionalLog(long l) {
 		long x = 200;
 		if (x % 1 == 0) {
@@ -354,27 +427,25 @@ public class CountStrings {
 
 	private static BigInteger [][] matrixPower2(BigInteger [][] matrix, long power) {
 		Set<Long> powersOfTwo = findPowersOfTwo(power);
-		List<BigInteger [][]> matrices = new ArrayList<BigInteger [][]>(); 
-		
+		List<BigInteger [][]> matrices = new ArrayList<BigInteger [][]>();
+
 		matrix = multiplyMatrices(matrix, matrix);
-		
+
 		for (long powerOfTwo: powersOfTwo) {
 			System.out.println("po2: " + powerOfTwo);
 			matrices.add(matrixPower(matrix, powerOfTwo));
 		}
-		
+
 		System.out.println("countm: " + matrices.size());
 
 		BigInteger [][] product = matrices.get(0);
-		printMatrix(product);
 		for (BigInteger [][] m : matrices.subList(1, matrices.size())) {
-			printMatrix(m);
 			product = multiplyMatrices(product, m);
 		}
-		
+
 		return product;
 	}
-	
+
 	private static BigInteger [][] matrixPower(BigInteger [][] matrix, long power) {
 		BigInteger [][] product = new BigInteger[matrix.length][matrix.length];
 		if (power == 0) {
@@ -385,15 +456,15 @@ public class CountStrings {
 					}
 					else {
 						product[i][k] = new BigInteger("0");
-					}					
+					}
 				}
-			}			
+			}
 			return matrix;
 		}
 		else if (power == 1) {
 			return matrix;
 		}
-				
+
 		for (int i = 0; i < product.length; ++i) {
 			for (int k = 0; k < product.length; ++k) {
 				product[i][k] = matrix[i][k];
@@ -415,6 +486,7 @@ public class CountStrings {
 				BigInteger sum = new BigInteger("0");
 				for (int ctr = 0; ctr < matrix1.length; ++ctr) {
 					sum = matrix1[i][ctr].multiply(matrix2[ctr][j]).add(sum);
+					sum = sum.mod(new BigInteger(String.valueOf(modBy)));
 				}
 
 				product[i][j] = sum;

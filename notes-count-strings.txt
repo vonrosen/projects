@@ -70,6 +70,7 @@ Break or into 2:
 
 
 a(b*c|c*d)
+https://www.rookieslab.com/posts/fast-power-algorithm-exponentiation-by-squaring-cpp-python-implementation
 https://math.stackexchange.com/questions/1256509/how-to-calculate-matrix-raised-to-a-high-power
 https://stackoverflow.com/questions/32663398/algorithm-for-regular-expressions-combinations-on-or
 https://cstheory.stackexchange.com/questions/8200/counting-words-accepted-by-a-regular-grammar
@@ -207,3 +208,12 @@ log2(10)=3.4594316186
 12555
 18298
 )
+
+
+(b(((((a|(b|a))*)|(((((a|(a*))|a)|(b|((a|a)*)))|(a*))|(a|a)))*)*)) 502014773
+
+
+502014773
+
+502014772
+
