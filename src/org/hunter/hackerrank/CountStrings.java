@@ -1,5 +1,8 @@
 package org.hunter.hackerrank;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -105,7 +108,9 @@ public class CountStrings {
 	private static long stringCount;
 	private static String regex = null;
 
-	public static void main(String [] args) {
+//	public static void main(String [] args) {
+	private static int countStrings(String regex, int length) {
+
 //		((ab)|(ba)) 2
 //		((a|b)*) 5
 //		((a*)(b(a*))) 100
@@ -117,7 +122,6 @@ public class CountStrings {
 //		((a|b)*) 5
 //		((a*)(b(a*))) 100
 
-		String word = "b";
 		//String regex = "a";
 		//String regex = "((a|b)*)";
 		//String regex = "(a(((b|(a(ba)))*)b))";
@@ -127,9 +131,9 @@ public class CountStrings {
 		//String regex = "(b(((((a|(b|a))*)|(((((a|(a*))|a)|(b|((a|a)*)))|(a*))|(a|a)))*)*))";
 		//String regex = "((a*)(b(a*)))";
 		//String regex = "(b(((((a|(b|a))*)|(((((a|(a*))|a)|(b|((a|a)*)))|(a*))|(a|a)))*)*))";
-		String regex = "((bb)|((((((aa)|(b|b))|(a|b))|(((a|a)|b)|((((ab)a)*)((b|b)*))))|(((ab)(((aa)a)|b))b))*))";
+		//regex = "((bb)|((((((aa)|(b|b))|(a|b))|(((a|a)|b)|((((ab)a)*)((b|b)*))))|(((ab)(((aa)a)|b))b))*))";
 //		long length = 502014773;
-		long length = 653338565;
+		//length = 653338565;
 		//long length = 100;
 
 		//919464569
@@ -146,16 +150,23 @@ public class CountStrings {
 		//ParseNode tree = regexToExpressionTree("((bb)|((((((aa)|(b|b))|(a|b))|(((a|a)|b)|((((ab)a)*)((b|b)*))))|(((ab)(((aa)a)|b))b))*))");
 		//ParseNode tree = regexToExpressionTree("(a(((b|(a(ba)))*)b))", 0);
 
+		currentPos = 0;
+		dfaStateCounter = 0;
+
 		if (!regex.contains("(")) {
 			regex = "(" + regex + ")";
 		}
 
+		//regex = "(((a(ba))(b*))|(((b|a)|(aa))((b((b|((b*)|(((((b*)a)b)*)*)))*))|(((a(b*))a)|(b|a)))))";
+		//length = 43625841;
 
-		BigInteger [][] m = new BigInteger[2][2];
-		m[0][0] = new BigInteger("1");
-		m[0][1] = new BigInteger("2");
-		m[1][0] = new BigInteger("3");
-		m[1][1] = new BigInteger("4");
+		//System.out.println(regex);
+
+//		BigInteger [][] m = new BigInteger[2][2];
+//		m[0][0] = new BigInteger("1");
+//		m[0][1] = new BigInteger("2");
+//		m[1][0] = new BigInteger("3");
+//		m[1][1] = new BigInteger("4");
 
 
 		//System.out.println(pow(2, 502014773));
@@ -170,22 +181,24 @@ public class CountStrings {
 
 		NFA nfa = expressionTreeToNFA(tree);
 
-		System.out.println("nfa initial = " + nfa.initial);
-		System.out.println("nfa last = " + nfa.last);
-		System.out.println("nfa size = " + nfa.size);
+//		System.out.println("nfa initial = " + nfa.initial);
+//		System.out.println("nfa last = " + nfa.last);
+//		System.out.println("nfa size = " + nfa.size);
 
 		DFA dfa = subsetConstruct(nfa);
 
-		System.out.println("dfa initial " + dfa.initial);
-		System.out.println("dfa transtable size " + dfa.transTable.size());
-		System.out.println("dfa final states size " + dfa.finalStates.size());
+//		System.out.println("dfa initial " + dfa.initial);
+//		System.out.println("dfa transtable size " + dfa.transTable.size());
+//		System.out.println("dfa final states size " + dfa.finalStates.size());
+
 		BigInteger [][] matrix = dfa.probabilityMatrixBigInteger();
 		BigInteger [][] productMatrix = matrixPower3(matrix, length);
-
-		printMatrix(productMatrix);
-
-		BigInteger sumAcceptingStates = sumAcceptingStates2(productMatrix, dfa);
-		System.out.println(sumAcceptingStates.mod(new BigInteger(new Long((long)Math.pow(10, 9) + 7).toString())));
+//
+		BigInteger sumAcceptingStates = sumAcceptingStates2(productMatrix, dfa).mod(
+				new BigInteger(new Long((long)Math.pow(10, 9) + 7).toString()));
+//
+//		System.out.println(sumAcceptingStates.toString());
+		return Integer.parseInt(sumAcceptingStates.toString());
 	}
 
 	private static void printMatrix(BigInteger [][] matrix) {
@@ -755,7 +768,7 @@ public class CountStrings {
 		String data = null;
 	}
 
-	static Stack<ParseNode> expressionStack = new Stack<ParseNode>();
+//	static Stack<ParseNode> expressionStack = new Stack<ParseNode>();
 
 	private static NFA expressionTreeToNFA(ParseNode tree) {
 		if (tree.type.equals(ParseNode.Type.CHAR)) {
@@ -775,14 +788,14 @@ public class CountStrings {
 		}
 	}
 
-	private static void printExpressionStack() {
-		for (ParseNode node: expressionStack) {
-			System.out.print(node.type);
-			System.out.print(" ");
-		}
-
-		System.out.println("endprint");
-	}
+//	private static void printExpressionStack() {
+//		for (ParseNode node: expressionStack) {
+//			System.out.print(node.type);
+//			System.out.print(" ");
+//		}
+//
+//		System.out.println("endprint");
+//	}
 
 //	private static ParseNode regexToExpressionTree2(String regex) {
 //
@@ -858,7 +871,17 @@ public class CountStrings {
 					ParseNode current = nodes.pop();
 					if (nodes.empty()) {
 						if (current.type.equals(ParseNode.Type.ALT)) {
-							current.right = last;
+							if (current.right != null) {
+								ParseNode concatNode = new ParseNode();
+								concatNode.type = ParseNode.Type.CONCAT;
+								concatNode.left = current.right;
+								concatNode.right = last;
+								current.right = concatNode;
+							}
+							else {
+								current.right = last;
+							}
+
 							return current;
 						}
 						else {
@@ -914,7 +937,7 @@ public class CountStrings {
 	/*
 	 * Complete the countStrings function below.
 	 */
-	static int countStrings(String r, int l) {
+//	static int countStrings(String r, int l) {
 		/*
 		 * Write your code here.
 		 */
@@ -922,11 +945,11 @@ public class CountStrings {
 		// l = length of strings that we are finding count for that match r
 		// 1000000000 = max of l
 
-		regex = r;
-		stringCount = 0;
-		calculateStringCount(l);
-
-		System.out.println("count is " + stringCount);
+//		regex = r;
+//		stringCount = 0;
+//		calculateStringCount(l);
+//
+//		System.out.println("count is " + stringCount);
 
 		// System.out.println("ps:");
 		// for (int i = 0; i < possibleStrings.length; ++i) {
@@ -939,8 +962,8 @@ public class CountStrings {
 		// }
 
 		// System.out.println("matches " + stringCount);
-		return (int) (stringCount % (long) (Math.pow(10, 9) + 7));
-	}
+//		return (int) (stringCount % (long) (Math.pow(10, 9) + 7));
+//	}
 
 	private static String[] calc(String[] strings1, String[] strings2) {
 		String[] newStrings = new String[strings1.length * strings2.length];
@@ -1054,24 +1077,25 @@ public class CountStrings {
 
 	private static final Scanner scanner = new Scanner(System.in);
 
-//	public static void main(String[] args) throws IOException {
-//		BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(System.getenv("OUTPUT_PATH")));
-//
-//		int t = Integer.parseInt(scanner.nextLine().trim());
-//
-//		for (int tItr = 0; tItr < t; tItr++) {
-//			String[] rl = scanner.nextLine().split(" ");
-//
-//			String r = rl[0];
-//
-//			int l = Integer.parseInt(rl[1].trim());
-//
-//			int result = countStrings(r, l);
-//
-//			bufferedWriter.write(String.valueOf(result));
-//			bufferedWriter.newLine();
-//		}
-//
-//		bufferedWriter.close();
-//	}
+	public static void main(String[] args) throws IOException {
+//		countStrings("", 0);
+		BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(System.getenv("OUTPUT_PATH")));
+
+		int t = Integer.parseInt(scanner.nextLine().trim());
+
+		for (int tItr = 0; tItr < t; tItr++) {
+			String[] rl = scanner.nextLine().split(" ");
+
+			String r = rl[0];
+
+			int l = Integer.parseInt(rl[1].trim());
+
+			int result = countStrings(r, l);
+
+			bufferedWriter.write(String.valueOf(result));
+			bufferedWriter.newLine();
+		}
+
+		bufferedWriter.close();
+	}
 }
