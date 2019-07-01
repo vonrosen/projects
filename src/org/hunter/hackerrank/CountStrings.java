@@ -16,6 +16,8 @@ import java.util.regex.Pattern;
 
 public class CountStrings {
 
+
+
 	private static BigInteger [][] createIdentityMatrix(int width, int height) {
 		BigInteger [][] matrix = new BigInteger[width][height];
 
@@ -33,7 +35,51 @@ public class CountStrings {
 		return matrix;
 	}
 
+	private static long [][] createIdentityMatrixLong(int width, int height) {
+		long [][] matrix = new long[width][height];
+
+		for (int i = 0; i < width; ++i) {
+			for (int j = 0; j < height; ++j) {
+				if (i == j) {
+					matrix[i][j] = 1;
+				}
+				else {
+					matrix[i][j] = 0;
+				}
+			}
+		}
+
+		return matrix;
+	}
+
 	private static long modBy = 1000000007L;
+
+	private static long [][] matrixPowerLong(long [][] matrix, long power) {
+		long [][] result = createIdentityMatrixLong(matrix.length, matrix.length);
+
+		System.out.println("mlength: " + matrix.length);
+
+		int it = 0;
+		while (power > 0) {
+			if (power % 2 == 0) {
+				power /= 2;
+				matrix = multiplyMatricesLong(matrix, matrix);
+			}
+			else {
+				power--;
+				result = multiplyMatricesLong(matrix, result);
+				power /= 2;
+				matrix = multiplyMatricesLong(matrix, matrix);
+			}
+
+//			System.out.println("p: " + power);
+			++it;
+		}
+
+		System.out.println("iters: " + it);
+
+		return result;
+	}
 
 	private static BigInteger [][] matrixPower3(BigInteger [][] matrix, long power) {
 		BigInteger [][] result = createIdentityMatrix(matrix.length, matrix.length);
@@ -157,8 +203,10 @@ public class CountStrings {
 			regex = "(" + regex + ")";
 		}
 
-		//regex = "(((a(ba))(b*))|(((b|a)|(aa))((b((b|((b*)|(((((b*)a)b)*)*)))*))|(((a(b*))a)|(b|a)))))";
-		//length = 43625841;
+//		regex = "((((b*)((b(a|a))a))(((a*)|a)a))((aa)((((((b*)*)(b|((b|(aa))|b)))(a|b))|(b*))*)))";
+//		length = 937477085;
+		//expected output = 971722885
+		//my output = 871840851
 
 		//System.out.println(regex);
 
@@ -177,7 +225,7 @@ public class CountStrings {
 
 		ParseNode tree = regexToExpressionTree(regex);
 
-		printTree(tree, 0);
+//		printTree(tree, 0);
 
 		NFA nfa = expressionTreeToNFA(tree);
 
@@ -187,18 +235,39 @@ public class CountStrings {
 
 		DFA dfa = subsetConstruct(nfa);
 
+//		System.out.println(dfa.simulate("baaaaabbbbbbbbbbba"));
+
 //		System.out.println("dfa initial " + dfa.initial);
 //		System.out.println("dfa transtable size " + dfa.transTable.size());
 //		System.out.println("dfa final states size " + dfa.finalStates.size());
 
-		BigInteger [][] matrix = dfa.probabilityMatrixBigInteger();
-		BigInteger [][] productMatrix = matrixPower3(matrix, length);
+		//BigInteger [][] matrix = dfa.probabilityMatrixBigInteger();
+		long [][] matrix = dfa.probabilityMatrix();
+		long [][] productMatrix = matrixPowerLong(matrix, length);
+//		printMatrixLong(productMatrix);
+//		BigInteger [][] productMatrix = matrixPower3(matrix, length);
+
 //
-		BigInteger sumAcceptingStates = sumAcceptingStates2(productMatrix, dfa).mod(
-				new BigInteger(new Long((long)Math.pow(10, 9) + 7).toString()));
+//		BigInteger sumAcceptingStates = sumAcceptingStates2(productMatrix, dfa).mod(
+//				new BigInteger(new Long((long)Math.pow(10, 9) + 7).toString()));
+		//long sumAcceptingStates = sumAcceptingStatesLong(productMatrix, dfa) % modBy;
+		long sumAcceptingStates = 1;
 //
-//		System.out.println(sumAcceptingStates.toString());
-		return Integer.parseInt(sumAcceptingStates.toString());
+		System.out.println(sumAcceptingStates);
+		//return Integer.parseInt(sumAcceptingStates.toString());
+//		System.exit(0);
+		return (int)sumAcceptingStates;
+	}
+
+	private static void printMatrixLong(long [][] matrix) {
+		for (int i = 0; i < matrix.length; ++i) {
+			for (int j = 0; j < matrix[i].length; ++j) {
+				System.out.print(matrix[i][j]);
+				System.out.print(" ");
+			}
+
+			System.out.println("");
+		}
 	}
 
 	private static void printMatrix(BigInteger [][] matrix) {
@@ -259,6 +328,16 @@ public class CountStrings {
 		}
 
 		return product;
+	}
+
+	private static long sumAcceptingStatesLong(long [][] productMatrix, DFA dfa) {
+		long sum = 0;
+
+		for (int finalState: dfa.finalStates) {
+			sum += productMatrix[dfa.initial][finalState];
+		}
+
+		return sum;
 	}
 
 	private static BigInteger sumAcceptingStates2(BigInteger [][] productMatrix, DFA dfa) {
@@ -500,6 +579,23 @@ public class CountStrings {
 				for (int ctr = 0; ctr < matrix1.length; ++ctr) {
 					sum = matrix1[i][ctr].multiply(matrix2[ctr][j]).add(sum);
 					sum = sum.mod(new BigInteger(String.valueOf(modBy)));
+				}
+
+				product[i][j] = sum;
+			}
+		}
+
+		return product;
+	}
+
+	private static long [][] multiplyMatricesLong(long [][] matrix1, long [][] matrix2) {
+		long [][] product = new long[matrix1.length][matrix2.length];
+
+		for (int i = 0; i < product.length; ++i) {
+			for (int j = 0; j < product.length; ++j) {
+				long sum = 0;
+				for (int ctr = 0; ctr < matrix1.length; ++ctr) {
+					sum += (matrix1[i][ctr] % modBy) * (matrix2[ctr][j] % modBy) % modBy;
 				}
 
 				product[i][j] = sum;
@@ -874,15 +970,15 @@ public class CountStrings {
 							if (current.right != null) {
 								ParseNode concatNode = new ParseNode();
 								concatNode.type = ParseNode.Type.CONCAT;
-								concatNode.left = current.right;
+								concatNode.left = current;
 								concatNode.right = last;
-								current.right = concatNode;
+
+								return concatNode;
 							}
 							else {
 								current.right = last;
+								return current;
 							}
-
-							return current;
 						}
 						else {
 							ParseNode concatNode = new ParseNode();
