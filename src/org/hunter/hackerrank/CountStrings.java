@@ -52,14 +52,31 @@ public class CountStrings {
 		return matrix;
 	}
 
-	private static long modBy = 1000000007L;
+	private static int [][] createIdentityMatrixInt(int width, int height) {
+		int [][] matrix = new int[width][height];
+
+		for (int i = 0; i < width; ++i) {
+			for (int j = 0; j < height; ++j) {
+				if (i == j) {
+					matrix[i][j] = 1;
+				}
+				else {
+					matrix[i][j] = 0;
+				}
+			}
+		}
+
+		return matrix;
+	}
+
+	private static int modBy = 1000000007;
 
 	private static long [][] matrixPowerLong(long [][] matrix, long power) {
 		long [][] result = createIdentityMatrixLong(matrix.length, matrix.length);
 
-		System.out.println("mlength: " + matrix.length);
+//		System.out.println("mlength: " + matrix.length);
 
-		int it = 0;
+//		int it = 0;
 		while (power > 0) {
 			if (power % 2 == 0) {
 				power /= 2;
@@ -73,10 +90,37 @@ public class CountStrings {
 			}
 
 //			System.out.println("p: " + power);
-			++it;
+//			++it;
 		}
 
-		System.out.println("iters: " + it);
+//		System.out.println("iters: " + it);
+
+		return result;
+	}
+
+	private static int [][] matrixPowerInt(int [][] matrix, int power) {
+		int [][] result = createIdentityMatrixInt(matrix.length, matrix.length);
+
+//		System.out.println("mlength: " + matrix.length);
+
+//		int it = 0;
+		while (power > 0) {
+			if (power % 2 == 0) {
+				power /= 2;
+				matrix = multiplyMatricesInt(matrix, matrix);
+			}
+			else {
+				power--;
+				result = multiplyMatricesInt(matrix, result);
+				power /= 2;
+				matrix = multiplyMatricesInt(matrix, matrix);
+			}
+
+//			System.out.println("p: " + power);
+//			++it;
+		}
+
+//		System.out.println("iters: " + it);
 
 		return result;
 	}
@@ -250,10 +294,9 @@ public class CountStrings {
 //
 //		BigInteger sumAcceptingStates = sumAcceptingStates2(productMatrix, dfa).mod(
 //				new BigInteger(new Long((long)Math.pow(10, 9) + 7).toString()));
-		//long sumAcceptingStates = sumAcceptingStatesLong(productMatrix, dfa) % modBy;
-		long sumAcceptingStates = 1;
+		long sumAcceptingStates = sumAcceptingStatesLong(productMatrix, dfa);
 //
-		System.out.println(sumAcceptingStates);
+//		System.out.println(sumAcceptingStates);
 		//return Integer.parseInt(sumAcceptingStates.toString());
 //		System.exit(0);
 		return (int)sumAcceptingStates;
@@ -330,6 +373,16 @@ public class CountStrings {
 		return product;
 	}
 
+	private static int sumAcceptingStatesInt(int [][] productMatrix, DFA dfa) {
+		int sum = 0;
+
+		for (int finalState: dfa.finalStates) {
+			sum += productMatrix[dfa.initial][finalState] % modBy;
+		}
+
+		return sum;
+	}
+
 	private static long sumAcceptingStatesLong(long [][] productMatrix, DFA dfa) {
 		long sum = 0;
 
@@ -337,7 +390,7 @@ public class CountStrings {
 			sum += productMatrix[dfa.initial][finalState];
 		}
 
-		return sum;
+		return sum % modBy;
 	}
 
 	private static BigInteger sumAcceptingStates2(BigInteger [][] productMatrix, DFA dfa) {
@@ -595,7 +648,26 @@ public class CountStrings {
 			for (int j = 0; j < product.length; ++j) {
 				long sum = 0;
 				for (int ctr = 0; ctr < matrix1.length; ++ctr) {
-					sum += (matrix1[i][ctr] % modBy) * (matrix2[ctr][j] % modBy) % modBy;
+					long p = (matrix1[i][ctr] * matrix2[ctr][j]) % modBy;
+					sum = (sum + p) % modBy;
+				}
+
+				product[i][j] = sum;
+			}
+		}
+
+		return product;
+	}
+
+	private static int [][] multiplyMatricesInt(int [][] matrix1, int [][] matrix2) {
+		int [][] product = new int[matrix1.length][matrix2.length];
+
+		for (int i = 0; i < product.length; ++i) {
+			for (int j = 0; j < product.length; ++j) {
+				int sum = 0;
+				for (int ctr = 0; ctr < matrix1.length; ++ctr) {
+					long p = (long)(matrix1[i][ctr] * matrix2[ctr][j]) % modBy;
+					sum = (sum + (int)p) % modBy;
 				}
 
 				product[i][j] = sum;
@@ -624,6 +696,19 @@ public class CountStrings {
 				int stateTo = transTable.get(tran);
 
 				matrix[stateFrom][stateTo] = matrix[stateFrom][stateTo].add(new BigInteger("1"));
+			}
+
+			return matrix;
+		}
+
+		int [][] probabilityMatrixInt() {
+			int [][] matrix = new int[transTable.size()][transTable.size()];
+
+			for (Transition tran : transTable.keySet()) {
+				int stateFrom = tran.state;
+				int stateTo = transTable.get(tran);
+
+				matrix[stateFrom][stateTo] += 1;
 			}
 
 			return matrix;
