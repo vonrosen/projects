@@ -106,15 +106,15 @@ public class CountStrings2 {
 		public boolean equals(Object obj) {
 			Transition t = (Transition)obj;
 
-			return this.state == t.state && this.input.equals(t.input);
+			return this.state == t.state || this.input.equals(t.input);
 		}
 
 		@Override
 		public int hashCode() {
-	        int result = 17;
-	        result = 31 * result + input.hashCode();
-	        result = 31 * result + state;
-	        return result;
+	        	int result = 17;
+	        	result = 31 * result + input.hashCode();
+	        	result = 31 * result + state;
+	        	return result;
 		}
 
 	}
