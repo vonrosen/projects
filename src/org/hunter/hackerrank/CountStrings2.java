@@ -3,16 +3,12 @@ package org.hunter.hackerrank;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.Stack;
-import java.util.regex.Pattern;
 
 public class CountStrings2 {
 
@@ -106,7 +102,7 @@ public class CountStrings2 {
 		public boolean equals(Object obj) {
 			Transition t = (Transition)obj;
 
-			return this.state == t.state || this.input.equals(t.input);
+			return this.state == t.state && this.input.equals(t.input);
 		}
 
 		@Override
