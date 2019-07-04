@@ -19,7 +19,8 @@ public class CountStrings2 {
             for (int j = 0; j < height; ++j) {
                 if (i == j) {
                     matrix[i][j] = 1;
-                } else {
+                }
+                else {
                     matrix[i][j] = 0;
                 }
             }
@@ -37,7 +38,8 @@ public class CountStrings2 {
             if (power % 2 == 0) {
                 power /= 2;
                 matrix = multiplyMatricesLong(matrix, matrix);
-            } else {
+            }
+            else {
                 power--;
                 result = multiplyMatricesLong(matrix, result);
                 power /= 2;
@@ -308,7 +310,8 @@ public class CountStrings2 {
                 if (set.size() == 0) {
                     // no more states to process
                     break;
-                } else {
+                }
+                else {
                     currentStates.clear();
                     currentStates.addAll(set);
                     results.addAll(set);
@@ -449,13 +452,17 @@ public class CountStrings2 {
     private static NFA expressionTreeToNFA(ParseNode tree) {
         if (tree.type.equals(ParseNode.Type.CHAR)) {
             return buildNFABasic(tree.data);
-        } else if (tree.type.equals(ParseNode.Type.STAR)) {
+        }
+        else if (tree.type.equals(ParseNode.Type.STAR)) {
             return buildNFAStar(expressionTreeToNFA(tree.left));
-        } else if (tree.type.equals(ParseNode.Type.ALT)) {
+        }
+        else if (tree.type.equals(ParseNode.Type.ALT)) {
             return buildNFAAlter(expressionTreeToNFA(tree.left), expressionTreeToNFA(tree.right));
-        } else if (tree.type.equals(ParseNode.Type.CONCAT)) {
+        }
+        else if (tree.type.equals(ParseNode.Type.CONCAT)) {
             return buildNFAConcat(expressionTreeToNFA(tree.left), expressionTreeToNFA(tree.right));
-        } else {
+        }
+        else {
             throw new RuntimeException("type of parse node not recognized: " + tree.type);
         }
     }
@@ -472,7 +479,8 @@ public class CountStrings2 {
                 currentPos = i + 1;
                 nodes.push(regexToExpressionTree(regex));
                 i = currentPos;
-            } else if (c == ')') {
+            }
+            else if (c == ')') {
                 currentPos = i;
                 ParseNode last = null;
 
@@ -484,7 +492,8 @@ public class CountStrings2 {
                         concatNode.type = ParseNode.Type.CONCAT;
                         concatNode.right = last;
                         return concatNode;
-                    } else {
+                    }
+                    else {
                         return last;
                     }
                 }
@@ -500,34 +509,40 @@ public class CountStrings2 {
                                 concatNode.right = last;
 
                                 return concatNode;
-                            } else {
+                            }
+                            else {
                                 current.right = last;
                                 return current;
                             }
-                        } else {
+                        }
+                        else {
                             ParseNode concatNode = new ParseNode();
                             concatNode.type = ParseNode.Type.CONCAT;
                             concatNode.right = last;
                             concatNode.left = current;
                             return concatNode;
                         }
-                    } else {
+                    }
+                    else {
                         last = current;
                     }
                 }
 
                 return nodes.pop();
-            } else if (c == '|') {
+            }
+            else if (c == '|') {
                 ParseNode altNode = new ParseNode();
                 altNode.type = ParseNode.Type.ALT;
                 altNode.left = nodes.pop();
                 nodes.push(altNode);
-            } else if (c == '*') {
+            }
+            else if (c == '*') {
                 ParseNode starNode = new ParseNode();
                 starNode.type = ParseNode.Type.STAR;
                 starNode.left = nodes.pop();
                 nodes.push(starNode);
-            } else {
+            }
+            else {
                 ParseNode charNode = new ParseNode();
                 charNode.type = ParseNode.Type.CHAR;
                 charNode.data = Character.toString(c);
