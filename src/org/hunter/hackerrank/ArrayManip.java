@@ -1,17 +1,41 @@
 package org.hunter.hackerrank;
 
-
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class ArrayManip {
 
     // Complete the arrayManipulation function below.
     static long arrayManipulation(int n, int[][] queries) {
+    		long biggestSum = 0;
+    		
+    		for (int i = 0; i < queries.length; ++i) {
+    			long sum = 0;
+    			final int currentIndex = i;
+//    			List<int []> intList = Arrays.stream(queries).collect(Collectors.toList());
+//    			intList.remove(currentIndex);
+//    			sum = intList.stream().filter(item -> 
+//    				item[0] >= queries[currentIndex][0] && item[0] <= queries[currentIndex][1] ||
+//    				item[1] >= queries[currentIndex][0] && item[1] <= queries[currentIndex][1]).mapToInt(item -> item[2]).sum();
+    			
+    			sum = Arrays.stream(queries).filter(item -> 
+    				item[0] >= queries[currentIndex][0] && item[0] <= queries[currentIndex][1] ||
+    				item[1] >= queries[currentIndex][0] && item[1] <= queries[currentIndex][1]).mapToInt(item -> item[2]).sum();
+    			
+    			System.out.println(sum);
+    			
+    			if (sum > biggestSum) {
+    				biggestSum = sum;
+    			}    			
+    		}
 
-
+    		System.out.println(biggestSum);
+    		return biggestSum;
     }
 
     private static final Scanner scanner = new Scanner(System.in);
