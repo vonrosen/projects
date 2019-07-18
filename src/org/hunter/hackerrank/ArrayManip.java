@@ -3,68 +3,225 @@ package org.hunter.hackerrank;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class ArrayManip {
 
     // Complete the arrayManipulation function below.
     static long arrayManipulation(int n, int[][] queries) {
     		long biggestSum = 0;
-    		long [][] sums = new long[queries.length][4];
+    		
+    		Arrays.sort(queries, new Comparator<int []>() {
+    			public int compare(int [] o1, int [] o2) {
+    				if (o1[0] > o2[0]) {
+    					return 1;
+    				}
+    				else if (o1[0] < o2[0]) {
+    					return -1;
+    				}
+    				else {
+    					return 0;
+    				}
+    			}
+    		});
 
+    		long nops = 0;
+    		long [] sums = new long[queries.length];
+    		long currentSum = 0;
+    		int minIndex = 0;
+    		long minValue = 0;
+    		System.out.println("begin");
     		for (int i = 0; i < queries.length; ++i) {
-//    			long sum1 = 0;
-//    			long sum2 = 0;
-//    			final int currentIndex = i;
-
-    			//System.out.println("array= " + queries[currentIndex][0] + "," + queries[currentIndex][1] + "," + queries[currentIndex][2]);
-
-//    			sum1 = Arrays.stream(queries).filter(item ->
-//    			    queries[currentIndex][0] >= item[0] && queries[currentIndex][0] <= item[1]).mapToInt(item -> item[2]).sum();
-//
-//                sum2 = Arrays.stream(queries).filter(item ->
-//                    queries[currentIndex][1] >= item[0] && queries[currentIndex][1] <= item[1]).mapToInt(item -> item[2]).sum();
-//
-//                sum1 = sum2 > sum1 ? sum2 : sum1;
-//
-//                biggestSum = sum1 > biggestSum ? sum1 : biggestSum;
-
-
-    		    if (i > 0) {
-    		        long sum = queries[i][2];
-    		        for (int j = 0; j < i; ++j) {
-    		            if (queries[i][0] >= sums[j][0] && queries[i][0] <= sums[j][1] ||
-    		                queries[i][1] >= sums[j][0] && queries[i][1] <= sums[j][1] ||
-    		                queries[i][0] < sums[j][0] && queries[i][1] > sums[j][1]) {
-
-    		                sum += sums[j][2];
-    		            }
-    		        }
-
-                    sums[i][0] = queries[i][0];
-                    sums[i][1] = queries[i][1];
-                    sums[i][2] = queries[i][2];
-                    sums[i][3] = sum;
-                    //System.out.println("it" + i + "=" + sum);
-    		    }
-    		    else {
-    		        sums[i][0] = queries[i][0];
-    		        sums[i][1] = queries[i][1];
-    		        sums[i][2] = queries[i][2];
-    		        sums[i][3] = queries[i][2];
-    		    }
+			currentSum = queries[i][2];
+			for (int j = 0; j < i; ++j) {
+				if (queries[i][0] <= queries[j][1]) {
+					currentSum += queries[j][2];
+				}
+			}
+		
+			sums[i] = currentSum;    			
     		}
+    		System.out.println("end");
+    		System.out.println("number ops " + nops);
 
-//    		for (int i = 0; i < sums.length; ++i) {
-//                System.out.println(sums[i][3]);
-//    		}
-
-    		biggestSum = Arrays.stream(sums).mapToLong(item -> item[3]).max().getAsLong();
-
-    		System.out.println("bs" + biggestSum);
-    		return biggestSum;
+    		System.out.println(Arrays.stream(sums).max().getAsLong());
+    		
+    		return Arrays.stream(sums).max().getAsLong();
     }
+    
+	static long arrayManipulation3(int n, int[][] queries) {
+		long biggestSum = 0;
+
+		Arrays.sort(queries, new Comparator<int[]>() {
+			public int compare(int[] o1, int[] o2) {
+				if (o1[0] > o2[0]) {
+					return 1;
+				} else if (o1[0] < o2[0]) {
+					return -1;
+				} else {
+					return 0;
+				}
+			}
+		});
+
+		long nops = 0;
+		long[] sums = new long[queries.length];
+		long currentSum = 0;		
+		List<int []> list1 = new ArrayList<int []>();
+		System.out.println("begin");
+		for (int i = 0; i < queries.length; ++i) {
+			Collections.sort(list1, new Comparator<int []>() {
+				public int compare(int [] o1, int [] o2) {
+					if (o1[1] > o2[1]) {
+						return 1;
+					} else if (o1[1] < o2[1]) {
+						return -1;
+					} else {
+						return 0;
+					}
+				}				
+			});
+
+			int currentIndex = i;
+			currentSum = queries[i][2];
+			currentSum += list1.stream().filter(item -> queries[currentIndex][0] <= item[1]).mapToLong(item -> item[2]).sum();
+			
+//			for (int j = 0; j < i; ++j) {
+//				if (queries[i][0] <= queries[j][1]) {
+//					currentSum += (long) queries[j][2];
+//				}
+//			}
+
+			list1.add(queries[i]);
+			sums[i] = currentSum;
+		}
+		System.out.println("end");
+		System.out.println("number ops " + nops);
+
+		System.out.println(Arrays.stream(sums).max().getAsLong());
+
+		return Arrays.stream(sums).max().getAsLong();
+	}    
+    
+	static long arrayManipulation2(int n, int[][] queries) {
+		long biggestSum = 0;
+
+		Arrays.sort(queries, new Comparator<int[]>() {
+			public int compare(int[] o1, int[] o2) {
+				if (o1[0] > o2[0]) {
+					return 1;
+				} else if (o1[0] < o2[0]) {
+					return -1;
+				} else {
+					return 0;
+				}
+			}
+		});
+
+		long nops = 0;
+		//long[][] sums = new long[queries.length][2];
+		List<long []> sums = new ArrayList<long []>();
+		long last1 = 0;
+		long min1 = 0;
+		long currentSum = 0;
+		int sumCounter = 0;
+		System.out.println("begin");
+		for (int i = 0; i < queries.length; ++i) {
+			if (i > 0) {
+				for (long [] sum : sums) {
+					if (queries[i][0] <= sum[]) {
+						sums[sumCounter][0] += (long)queries[i][2];
+						sums[sumCounter][1] = queries[i][1] < min1 ? queries[i][1] : min1;
+					}
+					else {
+						sums[++sumCounter] += (long)queries[i][2];
+						min1 = queries[i][1] < min1 ? queries[i][1] : min1;
+					}
+				}
+			}
+			else {
+				sums.add(new long [] { (long)queries[i][2], (long)queries[i][0] });
+			}
+		}
+		
+		System.out.println("end");
+		System.out.println("number ops " + nops);
+
+		System.out.println(Arrays.stream(sums).max().getAsLong());
+
+		return Arrays.stream(sums).max().getAsLong();
+	}   
+	
+//	static long arrayManipulation(int n, int[][] queries) {
+//		long biggestSum = 0;
+//		
+//		Arrays.sort(queries, new Comparator<int []>() {
+//			public int compare(int [] o1, int [] o2) {
+//				if (o1[0] > o2[0]) {
+//					return 1;
+//				}
+//				else if (o1[0] < o2[0]) {
+//					return -1;
+//				}
+//				else {
+//					return 0;
+//				}
+//			}
+//		});
+//		
+//		List<int []> queryList = new ArrayList<int []>();
+//		for (int [] query: queries) {
+//			queryList.add(query);
+//		}
+//
+//		
+//		long sum  = 0;
+//		for (int i = 0; i < queryList.size() + queryList.size(); ++i) {
+//			if (i > 100) {
+//				sum += 1;
+//			}
+//		}
+//		
+//		System.out.println(sum);
+//		return sum;
+//		
+//		long [] sums = new long[queries.length];
+//		long currentSum = 0;
+//		int qlsize = queryList.size();
+//		int sumIndex = 0;
+//		for (int i = 0; i < qlsize; ++i) {
+//			if (i > 0) {
+//				currentSum = queryList.get(i)[2];
+//				for (int j = 0; j < i; ++j) {
+//					if (queryList.get(i)[0] <= queryList.get(j)[1]) {
+//						currentSum += (long)queryList.get(j)[2];
+//					}
+//					else {
+//						queryList.remove(j);
+//						--qlsize;
+//						--j;
+//						--i;
+//						System.out.println("qlsize" + qlsize);
+//					}
+//				}
+//				
+//				sums[sumIndex++] = currentSum;
+//			}
+//			else {
+//				sums[sumIndex++] = (long)queryList.get(i)[2];
+//			}
+//		}
+//
+//		System.out.println(Arrays.stream(sums).map(item -> item).max().getAsLong());
+//		
+//		return Arrays.stream(sums).map(item -> item).max().getAsLong();		
+//	}	
 
     private static final Scanner scanner = new Scanner(System.in);
 
