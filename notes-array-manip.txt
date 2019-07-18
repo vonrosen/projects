@@ -13,4 +13,31 @@ return greatest sum of overlaps
 Q * Q
 
 
+1	120	4
+20	22	5
+100	101	6
+
+
+1	120	4
+100	101	6
+20	22	5
+
+
+intersect of to the left and to the right are overlaps for a given row
+
+1	120	4
+--
+1	120	4
+100	101	6
+
+
+
+1 5 3
+4 8 7
+6 9 1
+
+
+6 9 1
+4 8 7
+1 5 3
 
