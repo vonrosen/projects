@@ -14,9 +14,7 @@ import java.util.stream.Collectors;
 public class ArrayManip {
 
     // Complete the arrayManipulation function below.
-    static long arrayManipulation4(int n, int[][] queries) {
-        long biggestSum = 0;
-
+    static long arrayManipulation(int n, int[][] queries) {
         Arrays.sort(queries, new Comparator<int[]>() {
             @Override
             public int compare(int[] o1, int[] o2) {
@@ -32,11 +30,8 @@ public class ArrayManip {
             }
         });
 
-        long nops = 0;
-        long[] sums = new long[queries.length];
         long currentSum = 0;
-        int minIndex = 0;
-        long minValue = 0;
+        long maxSum = 0;
 //    		System.out.println("begin");
         for (int i = 0; i < queries.length; ++i) {
             currentSum = queries[i][2];
@@ -46,14 +41,14 @@ public class ArrayManip {
                 }
             }
 
-            sums[i] = currentSum;
+            maxSum = currentSum > maxSum ? currentSum : maxSum;
         }
 //    		System.out.println("end");
 //    		System.out.println("number ops " + nops);
 
-        System.out.println(Arrays.stream(sums).max().getAsLong());
+        System.out.println(maxSum);
 
-        return Arrays.stream(sums).max().getAsLong();
+        return maxSum;
     }
 
     static class ArrayKey {
@@ -79,84 +74,78 @@ public class ArrayManip {
         }
     }
 
-    static long arrayManipulation(int n, int[][] queries) {
-        Arrays.sort(queries, new Comparator<int[]>() {
-            @Override
-            public int compare(int[] o1, int[] o2) {
-                if (o1[0] > o2[0]) {
-                    return 1;
-                }
-                else if (o1[0] < o2[0]) {
-                    return -1;
-                }
-                else {
-                    return 0;
-                }
-            }
-        });
-
-//        Map<ArrayKey, Integer> sortedByStart = new HashMap<ArrayKey, Integer>();
-//        Map<ArrayKey, Integer> sortedByEnd = new HashMap<ArrayKey, Integer>();
-
-        List<ArrayKey> sortedByStart = new ArrayList<ArrayKey>();
-        List<ArrayKey> sortedByEnd = new ArrayList<ArrayKey>();
-
-        for (int [] query : queries) {
-            ArrayKey ak = new ArrayKey();
-            ak.start = query[0];
-            ak.end = query[1];
-            ak.value = query[2];
-
-            sortedByStart.add(ak);
-        }
-
-        Arrays.sort(queries, new Comparator<int[]>() {
-            @Override
-            public int compare(int[] o1, int[] o2) {
-                if (o1[1] > o2[1]) {
-                    return 1;
-                }
-                else if (o1[1] < o2[1]) {
-                    return -1;
-                }
-                else {
-                    return 0;
-                }
-            }
-        });
-
-        for (int [] query : queries) {
-            ArrayKey ak = new ArrayKey();
-            ak.start = query[0];
-            ak.end = query[1];
-            ak.value = query[2];
-
-            sortedByEnd.add(ak);
-        }
-
-        long [] sums = new long[queries.length];
-
-        for (int i = 0; i < queries.length; ++i) {
-            ArrayKey ak = new ArrayKey();
-            ak.start = queries[i][0];
-            ak.end= queries[i][1];
-            ak.value = queries[i][2];
-
-            int indexStart = sortedByStart.indexOf(ak);
-            int indexEnd = sortedByEnd.indexOf(ak);
-
-            List<ArrayKey> started = sortedByStart.subList(0, indexStart);
-            List<ArrayKey> ended = sortedByEnd.subList(0, indexEnd);
-
-            List<ArrayKey> matched = started.stream().filter(item -> ended.contains(item)).collect(Collectors.toList());
-
-            sums[i] = queries[i][2] + matched.stream().mapToInt(item -> item.value).sum();
-        }
-
-        System.out.println(Arrays.stream(sums).max().getAsLong());
-
-        return Arrays.stream(sums).max().getAsLong();
-    }
+//    static long arrayManipulation(int n, int[][] queries) {
+//        Arrays.sort(queries, new Comparator<int[]>() {
+//            @Override
+//            public int compare(int[] o1, int[] o2) {
+//                if (o1[0] > o2[0]) {
+//                    return 1;
+//                }
+//                else if (o1[0] < o2[0]) {
+//                    return -1;
+//                }
+//                else {
+//                    return 0;
+//                }
+//            }
+//        });
+//
+//        List<ArrayKey> sortedByStart = new ArrayList<ArrayKey>();
+//        List<ArrayKey> sortedByEnd = new ArrayList<ArrayKey>();
+//
+//        for (int [] query : queries) {
+//            ArrayKey ak = new ArrayKey();
+//            ak.start = query[0];
+//            ak.end = query[1];
+//            ak.value = query[2];
+//
+//            sortedByStart.add(ak);
+//        }
+//
+//        Arrays.sort(queries, new Comparator<int[]>() {
+//            @Override
+//            public int compare(int[] o1, int[] o2) {
+//                if (o1[1] > o2[1]) {
+//                    return 1;
+//                }
+//                else if (o1[1] < o2[1]) {
+//                    return -1;
+//                }
+//                else {
+//                    return 0;
+//                }
+//            }
+//        });
+//
+//        for (int [] query : queries) {
+//            ArrayKey ak = new ArrayKey();
+//            ak.start = query[0];
+//            ak.end = query[1];
+//            ak.value = query[2];
+//
+//            sortedByEnd.add(ak);
+//        }
+//
+//        long [] sums = new long[queries.length];
+//
+//        for (int i = 0; i < queries.length; ++i) {
+//            ArrayKey ak = new ArrayKey();
+//            ak.start = queries[i][0];
+//            ak.end= queries[i][1];
+//            ak.value = queries[i][2];
+//
+////            List<ArrayKey> matchedByStart = sortedByStart.stream().filter(item -> ak.start >= item.start).collect(Collectors.toList());
+////            List<ArrayKey> matchedByEnd = sortedByEnd.stream().filter(item -> ak.start <= item.end).collect(Collectors.toList());
+////            List<ArrayKey> matchedByStart2 = sortedByStart.stream().filter(item -> ak.start < item.start).collect(Collectors.toList());
+////            List<ArrayKey> matchedByEnd2 = sortedByEnd.stream().filter(item -> ak.start > item.start).collect(Collectors.toList());
+//
+//            sums[i] = 0;
+//        }
+//
+//        System.out.println(Arrays.stream(sums).max().getAsLong());
+//
+//        return Arrays.stream(sums).max().getAsLong();
+//    }
 
     static long arrayManipulation3(int n, int[][] queries) {
         long biggestSum = 0;
