@@ -41,3 +41,10 @@ intersect of to the left and to the right are overlaps for a given row
 4 8 7
 1 5 3
 
+
+100 4
+23 50 5
+23 30 10
+24 40 10 - 24 to 30 = 25, 31 to 40 = 15 - correct
+24 60 10 - 24 to 40 = 35 but it should be 24 to 30 = 35 and 31 to 40 = 25 and 41 to 50 = 15 and 51 to 60 = 10
+

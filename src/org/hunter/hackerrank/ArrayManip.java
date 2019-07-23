@@ -77,7 +77,6 @@ public class ArrayManip {
         });
 
         long currentSum = 0;
-        long maxSum = 0;
         long [] sums = new long[n + 1];
         for (int i = 0; i < queries.length; ++i) {
             currentSum = queries[i][2];
@@ -88,37 +87,12 @@ public class ArrayManip {
             		System.arraycopy(array, 0, sums, queries[i][0], array.length);
             }
             else {
-            		if (queries[i - 1][1] >= queries[i][0]) {
-            			//there is an overlap            	
-            			if (queries[i - 1][1] >= queries[i][1]) {
-//            				1 1600 359725
-//            				7 1587 825120
-            				
-                			long [] array = new long[queries[i][1] - queries[i][0] + 1];
-                			Arrays.fill(array, currentSum + sums[queries[i][0]]);
-                			System.arraycopy(array, 0, sums, queries[i][0], array.length);            				
-            			}
-            			else {
-            				
-//            				1 1401 359725
-//            				1400 1402 825120
-            				
-                			long [] array = new long[queries[i - 1][1] - queries[i][0] + 1];
-                			Arrays.fill(array, currentSum + 	sums[queries[i][0]]);
-                			System.arraycopy(array, 0, sums, queries[i][0], array.length);   
-                			
-                			for (int j = queries[i - 1][1] + 1; j <= queries[i][1]; ++j) {
-                				sums[j] += currentSum;
-                			}
-            			}
-            		}
-            		else {
-            			//no overlap
-            			for (int j = queries[i][0]; j <= queries[i][1]; ++j) {
-            				sums[j] += queries[i][2];
-            			}            			
-            		}
-            }            
+            	
+	            	for (int j = queries[i][0]; j <= queries[i][1]; ++j) {
+	    				sums[j] += currentSum;
+	    			}
+            	
+            }       
         }
 
         System.out.println(Arrays.stream(sums).max().getAsLong());
