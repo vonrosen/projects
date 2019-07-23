@@ -3,6 +3,7 @@ package org.hunter.hackerrank;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -76,28 +77,55 @@ public class ArrayManip {
             }
         });
 
-        long currentSum = 0;
-        long [] sums = new long[n + 1];
+        long [][][] array = new long[n + 1][queries.length][2]; 
         for (int i = 0; i < queries.length; ++i) {
-            currentSum = queries[i][2];
-            
-            if (i == 0) {
-            		long [] array = new long[queries[i][1] - queries[i][0] + 1];
-            		Arrays.fill(array, currentSum);
-            		System.arraycopy(array, 0, sums, queries[i][0], array.length);
-            }
-            else {
-            	
-	            	for (int j = queries[i][0]; j <= queries[i][1]; ++j) {
-	    				sums[j] += currentSum;
-	    			}
-            	
-            }       
+        
+        		if (i == 0) {
+            		array[queries[i][0]][0][0] = queries[i][2];
+            		array[queries[i][0]][0][1] = 0;
+            		array[queries[i][1]][0][0] = queries[i][2];;
+            		array[queries[i][1]][0][1] = 1;
+        		}
+        		else {
+        			if (array[queries[i][0]][0][0] > 0) {
+        				for (int j = 0; j < array[queries[i][0]].length; ++j) {
+        					if (array[queries[i][0]][j][0] == 0) {
+        	            			array[queries[i][0]][j][0] = queries[i][2];
+        	            			array[queries[i][0]][j][1] = 0;        						
+        						break;
+        					}
+        				}        				
+        			}
+        			else {
+                		array[queries[i][0]][0][0] = queries[i][2];
+                		array[queries[i][0]][0][1] = 0;        				
+        			}
+        			        			
+        			if (array[queries[i][1]][0][0] > 0) {
+        				for (int j = 0; j < array[queries[i][1]].length; ++j) {
+        					if (array[queries[i][1]][j][0] == 0) {
+        	            			array[queries[i][1]][j][0] = queries[i][2];
+        	            			array[queries[i][1]][j][1] = 1;        						
+        						break;
+        					}
+        				}
+        			}
+        			else {
+                		array[queries[i][1]][0][0] = queries[i][2];;
+                		array[queries[i][1]][0][1] = 1;        				
+        			}        			
+        		}
+        }
+        
+        long [] sums = new long[n];
+        int sumIndex = 0;
+        for (int i = 0; i < n + 1; ++i) {
+        		
         }
 
-        System.out.println(Arrays.stream(sums).max().getAsLong());
+        System.out.println(Arrays.stream(finalSums).max().getAsLong());
 
-        return Arrays.stream(sums).max().getAsLong();
+        return Arrays.stream(finalSums).max().getAsLong();
     }    
 
     static class ArrayKey {
