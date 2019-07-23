@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 public class ArrayManip {
 
     // Complete the arrayManipulation function below.
-    static long arrayManipulation(int n, int[][] queries) {
+    static long arrayManipulation6(int n, int[][] queries) {
         Arrays.sort(queries, new Comparator<int[]>() {
             @Override
             public int compare(int[] o1, int[] o2) {
@@ -50,6 +50,81 @@ public class ArrayManip {
 
         return maxSum;
     }
+    
+    static long arrayManipulation(int n, int[][] queries) {
+  
+//    		queries = new int [][] {
+//    		    	{2, 6, 8},
+//    		    	{3, 5, 7},
+//    		    	{1, 8, 1},
+//    		    	{5, 9, 15  }  				    				
+//    		};
+//    		n = 10;
+    	
+        Arrays.sort(queries, new Comparator<int[]>() {
+            @Override
+            public int compare(int[] o1, int[] o2) {
+                if (o1[0] > o2[0]) {
+                    return 1;
+                }
+                else if (o1[0] < o2[0]) {
+                    return -1;
+                }
+                else {
+                    return 0;
+                }
+            }
+        });
+
+        long currentSum = 0;
+        long maxSum = 0;
+        long [] sums = new long[n + 1];
+        for (int i = 0; i < queries.length; ++i) {
+            currentSum = queries[i][2];
+            
+            if (i == 0) {
+            		long [] array = new long[queries[i][1] - queries[i][0] + 1];
+            		Arrays.fill(array, currentSum);
+            		System.arraycopy(array, 0, sums, queries[i][0], array.length);
+            }
+            else {
+            		if (queries[i - 1][1] >= queries[i][0]) {
+            			//there is an overlap            	
+            			if (queries[i - 1][1] >= queries[i][1]) {
+//            				1 1600 359725
+//            				7 1587 825120
+            				
+                			long [] array = new long[queries[i][1] - queries[i][0] + 1];
+                			Arrays.fill(array, currentSum + sums[queries[i][0]]);
+                			System.arraycopy(array, 0, sums, queries[i][0], array.length);            				
+            			}
+            			else {
+            				
+//            				1 1401 359725
+//            				1400 1402 825120
+            				
+                			long [] array = new long[queries[i - 1][1] - queries[i][0] + 1];
+                			Arrays.fill(array, currentSum + 	sums[queries[i][0]]);
+                			System.arraycopy(array, 0, sums, queries[i][0], array.length);   
+                			
+                			for (int j = queries[i - 1][1] + 1; j <= queries[i][1]; ++j) {
+                				sums[j] += currentSum;
+                			}
+            			}
+            		}
+            		else {
+            			//no overlap
+            			for (int j = queries[i][0]; j <= queries[i][1]; ++j) {
+            				sums[j] += queries[i][2];
+            			}            			
+            		}
+            }            
+        }
+
+        System.out.println(Arrays.stream(sums).max().getAsLong());
+
+        return Arrays.stream(sums).max().getAsLong();
+    }    
 
     static class ArrayKey {
         int start;
@@ -323,6 +398,7 @@ public class ArrayManip {
 //	}
 
     private static final Scanner scanner = new Scanner(System.in);
+    
 
     public static void main(String[] args) throws IOException {
         BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(System.getenv("OUTPUT_PATH")));
