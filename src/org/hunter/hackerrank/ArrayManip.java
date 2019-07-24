@@ -14,6 +14,24 @@ import java.util.stream.Collectors;
 
 public class ArrayManip {
 
+	
+	static long arrayManipulation7(int n, int[][] queries) {
+		
+		for (int i = 0; i < queries.length; ++i) {
+		}
+
+		// for (int i = 0; i < sums.length; ++i) {
+		// System.out.println("0: " + sums[i][0]);
+		// System.out.println("1: " + sums[i][1]);
+		// }
+
+		
+
+		System.out.println(Arrays.stream(finalSums).max().getAsLong());
+
+		return Arrays.stream(finalSums).max().getAsLong();
+	}
+    
     // Complete the arrayManipulation function below.
     static long arrayManipulation6(int n, int[][] queries) {
         Arrays.sort(queries, new Comparator<int[]>() {
@@ -77,51 +95,55 @@ public class ArrayManip {
             }
         });
 
-        long [][][] array = new long[n + 1][queries.length][2]; 
+        long [][] sums = new long[n + 1][2];
         for (int i = 0; i < queries.length; ++i) {
-        
-        		if (i == 0) {
-            		array[queries[i][0]][0][0] = queries[i][2];
-            		array[queries[i][0]][0][1] = 0;
-            		array[queries[i][1]][0][0] = queries[i][2];;
-            		array[queries[i][1]][0][1] = 1;
+        		if (sums[queries[i][0]][1] > 0) {
+        			//sums[queries[i][0]][0] = queries[i][2] > sums[queries[i][0]][0] ? queries[i][2] : sums[queries[i][0]][0];
+        			sums[queries[i][0]][0] += queries[i][2];
+        			sums[queries[i][0]][1] = 3;
         		}
         		else {
-        			if (array[queries[i][0]][0][0] > 0) {
-        				for (int j = 0; j < array[queries[i][0]].length; ++j) {
-        					if (array[queries[i][0]][j][0] == 0) {
-        	            			array[queries[i][0]][j][0] = queries[i][2];
-        	            			array[queries[i][0]][j][1] = 0;        						
-        						break;
-        					}
-        				}        				
-        			}
-        			else {
-                		array[queries[i][0]][0][0] = queries[i][2];
-                		array[queries[i][0]][0][1] = 0;        				
-        			}
-        			        			
-        			if (array[queries[i][1]][0][0] > 0) {
-        				for (int j = 0; j < array[queries[i][1]].length; ++j) {
-        					if (array[queries[i][1]][j][0] == 0) {
-        	            			array[queries[i][1]][j][0] = queries[i][2];
-        	            			array[queries[i][1]][j][1] = 1;        						
-        						break;
-        					}
-        				}
-        			}
-        			else {
-                		array[queries[i][1]][0][0] = queries[i][2];;
-                		array[queries[i][1]][0][1] = 1;        				
-        			}        			
+        			sums[queries[i][0]][0] = queries[i][2];  
+        			sums[queries[i][0]][1] = 1;        			
+        		}
+        		
+        		if (sums[queries[i][1]][1] > 0) {
+        			//sums[queries[i][1]][0] = queries[i][2] > sums[queries[i][1]][0] ? queries[i][2] : sums[queries[i][1]][0];
+        			sums[queries[i][1]][0] += queries[i][2];  
+        			sums[queries[i][1]][1] = 3;
+        		}
+        		else {
+            		sums[queries[i][1]][0] = queries[i][2];
+            		sums[queries[i][1]][1] = 2;
         		}
         }
         
-        long [] sums = new long[n];
-        int sumIndex = 0;
-        for (int i = 0; i < n + 1; ++i) {
-        		
+//        for (int i = 0; i < sums.length; ++i) {
+//        		System.out.println("0: " + sums[i][0]);
+//        		System.out.println("1: " + sums[i][1]);
+//        }
+        
+        long [] finalSums = new long[n];
+        int finalSumIndex = 0;
+        long currentSum = 0;
+        for (int i = 0; i < sums.length; ++i) {
+        		if (sums[i][1] == 1) {
+        			currentSum += sums[i][0];        			
+        		}
+        		else if (sums[i][1] == 2) {
+        			currentSum = sums[i][0] > currentSum ? sums[i][0] : currentSum;
+        			finalSums[finalSumIndex] = currentSum;
+        			currentSum = 0;
+        			++finalSumIndex;
+        		}
+        		else if (sums[i][1] == 3) {
+        			currentSum = sums[i][0] > currentSum ? sums[i][0] : currentSum;
+        			finalSums[finalSumIndex] = currentSum;
+        			currentSum = 0;
+        			++finalSumIndex;        			
+        		}
         }
+        
 
         System.out.println(Arrays.stream(finalSums).max().getAsLong());
 
