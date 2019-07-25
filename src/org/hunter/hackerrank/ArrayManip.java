@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class ArrayManip {
 
@@ -49,23 +50,63 @@ public class ArrayManip {
 
         return maxSum;
     }
+
+    static long arrayManipulation10(int n, int[][] queries) {
+    	  
+        //0 = sum of beginings
+        //1 = sum of endings
+        long [][] sums = new long[n + 1][2];
+        int max1 = Arrays.stream(queries).mapToInt(item -> item[1]).max().getAsInt();
+        for (int i = 0; i < queries.length; ++i) {
+                sums[queries[i][0]][0] += queries[i][2];
+                sums[queries[i][1]][1] += queries[i][2];
+                
+//                max1 = queries[i][1] > max1 ? queries[i][1] : max1;
+        }
+
+        long currentSum = 0;
+        long maxSum = 0;
+        for (int i = 0; i <= max1; ++i) {
+                if (sums[i][0] > 0) {
+                    currentSum += sums[i][0];                    
+                }
+                
+                if (sums[i][1] > 0) {
+                    maxSum = currentSum > maxSum ? currentSum : maxSum;
+                    currentSum -= sums[i][1];
+                }
+        }
+        
+        System.out.println(maxSum);
+
+        return maxSum;
+    }    
     
     static long arrayManipulation(int n, int[][] queries) {
   
         //0 = sum of beginings
         //1 = sum of endings
+//    		System.out.println("start0 " + queries.length);
         long [][] sums = new long[n + 1][2];
-        int max1 = Arrays.stream(queries).mapToInt(item -> item[1]).max().getAsInt();
+        //int max1 = Arrays.stream(queries).mapToInt(item -> item[1]).max().getAsInt();
         for (int i = 0; i < queries.length; ++i) {
         		sums[queries[i][0]][0] += queries[i][2];
         		sums[queries[i][1]][1] += queries[i][2];
         		
 //        		max1 = queries[i][1] > max1 ? queries[i][1] : max1;
         }
+        
+//        System.out.println("end0");
 
+
+//        System.out.println(sums.length);
+        sums = (long [][])Arrays.stream(sums).filter(item -> item[0] > 0 || item[1] > 0).toArray(long [][]::new);     
+//        System.out.println(sums.length);
+        
+//        System.out.println("start");
         long currentSum = 0;
         long maxSum = 0;
-        for (int i = 0; i <= max1; ++i) {
+        for (int i = 0; i < sums.length; ++i) {
         		if (sums[i][0] > 0) {
         			currentSum += sums[i][0];        			
         		}
@@ -75,8 +116,9 @@ public class ArrayManip {
         			currentSum -= sums[i][1];
         		}
         }
+//        System.out.println("end");
         
-       // System.out.println(maxSum);
+        //System.out.println(maxSum);
 
         return maxSum;
     }    
