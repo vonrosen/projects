@@ -15,22 +15,7 @@ import java.util.stream.Collectors;
 public class ArrayManip {
 
 	
-	static long arrayManipulation7(int n, int[][] queries) {
-		
-		for (int i = 0; i < queries.length; ++i) {
-		}
 
-		// for (int i = 0; i < sums.length; ++i) {
-		// System.out.println("0: " + sums[i][0]);
-		// System.out.println("1: " + sums[i][1]);
-		// }
-
-		
-
-		System.out.println(Arrays.stream(finalSums).max().getAsLong());
-
-		return Arrays.stream(finalSums).max().getAsLong();
-	}
     
     // Complete the arrayManipulation function below.
     static long arrayManipulation6(int n, int[][] queries) {
@@ -109,7 +94,7 @@ public class ArrayManip {
         		
         		if (sums[queries[i][1]][1] > 0) {
         			//sums[queries[i][1]][0] = queries[i][2] > sums[queries[i][1]][0] ? queries[i][2] : sums[queries[i][1]][0];
-        			sums[queries[i][1]][0] += queries[i][2];  
+        			sums[queries[i][1]][0] -= queries[i][2];  
         			sums[queries[i][1]][1] = 3;
         		}
         		else {
