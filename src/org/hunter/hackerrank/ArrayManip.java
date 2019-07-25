@@ -3,21 +3,16 @@ package org.hunter.hackerrank;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
-import java.util.stream.Collectors;
 
 public class ArrayManip {
 
-	
-
-    
-    // Complete the arrayManipulation function below.
+	// Complete the arrayManipulation function below.
     static long arrayManipulation6(int n, int[][] queries) {
         Arrays.sort(queries, new Comparator<int[]>() {
             @Override
@@ -57,82 +52,33 @@ public class ArrayManip {
     
     static long arrayManipulation(int n, int[][] queries) {
   
-//    		queries = new int [][] {
-//    		    	{2, 6, 8},
-//    		    	{3, 5, 7},
-//    		    	{1, 8, 1},
-//    		    	{5, 9, 15  }  				    				
-//    		};
-//    		n = 10;
-    	
-        Arrays.sort(queries, new Comparator<int[]>() {
-            @Override
-            public int compare(int[] o1, int[] o2) {
-                if (o1[0] > o2[0]) {
-                    return 1;
-                }
-                else if (o1[0] < o2[0]) {
-                    return -1;
-                }
-                else {
-                    return 0;
-                }
-            }
-        });
-
+        //0 = sum of beginings
+        //1 = sum of endings
         long [][] sums = new long[n + 1][2];
+        int max1 = Arrays.stream(queries).mapToInt(item -> item[1]).max().getAsInt();
         for (int i = 0; i < queries.length; ++i) {
-        		if (sums[queries[i][0]][1] > 0) {
-        			//sums[queries[i][0]][0] = queries[i][2] > sums[queries[i][0]][0] ? queries[i][2] : sums[queries[i][0]][0];
-        			sums[queries[i][0]][0] += queries[i][2];
-        			sums[queries[i][0]][1] = 3;
-        		}
-        		else {
-        			sums[queries[i][0]][0] = queries[i][2];  
-        			sums[queries[i][0]][1] = 1;        			
-        		}
+        		sums[queries[i][0]][0] += queries[i][2];
+        		sums[queries[i][1]][1] += queries[i][2];
         		
-        		if (sums[queries[i][1]][1] > 0) {
-        			//sums[queries[i][1]][0] = queries[i][2] > sums[queries[i][1]][0] ? queries[i][2] : sums[queries[i][1]][0];
-        			sums[queries[i][1]][0] -= queries[i][2];  
-        			sums[queries[i][1]][1] = 3;
-        		}
-        		else {
-            		sums[queries[i][1]][0] = queries[i][2];
-            		sums[queries[i][1]][1] = 2;
-        		}
+//        		max1 = queries[i][1] > max1 ? queries[i][1] : max1;
         }
-        
-//        for (int i = 0; i < sums.length; ++i) {
-//        		System.out.println("0: " + sums[i][0]);
-//        		System.out.println("1: " + sums[i][1]);
-//        }
-        
-        long [] finalSums = new long[n];
-        int finalSumIndex = 0;
+
         long currentSum = 0;
-        for (int i = 0; i < sums.length; ++i) {
-        		if (sums[i][1] == 1) {
+        long maxSum = 0;
+        for (int i = 0; i <= max1; ++i) {
+        		if (sums[i][0] > 0) {
         			currentSum += sums[i][0];        			
         		}
-        		else if (sums[i][1] == 2) {
-        			currentSum = sums[i][0] > currentSum ? sums[i][0] : currentSum;
-        			finalSums[finalSumIndex] = currentSum;
-        			currentSum = 0;
-        			++finalSumIndex;
-        		}
-        		else if (sums[i][1] == 3) {
-        			currentSum = sums[i][0] > currentSum ? sums[i][0] : currentSum;
-        			finalSums[finalSumIndex] = currentSum;
-        			currentSum = 0;
-        			++finalSumIndex;        			
+        		
+        		if (sums[i][1] > 0) {
+        			maxSum = currentSum > maxSum ? currentSum : maxSum;
+        			currentSum -= sums[i][1];
         		}
         }
         
+       // System.out.println(maxSum);
 
-        System.out.println(Arrays.stream(finalSums).max().getAsLong());
-
-        return Arrays.stream(finalSums).max().getAsLong();
+        return maxSum;
     }    
 
     static class ArrayKey {
