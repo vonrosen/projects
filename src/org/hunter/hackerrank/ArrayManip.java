@@ -86,17 +86,21 @@ public class ArrayManip {
   
         //0 = sum of beginings
         //1 = sum of endings
-//    		System.out.println("start0 " + queries.length);
+    		System.out.println("start0 " + n);
         long [][] sums = new long[n + 1][2];
+        
+        System.out.println("start0 " + n);
         //int max1 = Arrays.stream(queries).mapToInt(item -> item[1]).max().getAsInt();
         for (int i = 0; i < queries.length; ++i) {
         		sums[queries[i][0]][0] += queries[i][2];
         		sums[queries[i][1]][1] += queries[i][2];
         		
+
+        		
 //        		max1 = queries[i][1] > max1 ? queries[i][1] : max1;
         }
         
-//        System.out.println("end0");
+        System.out.println("end0");
 
 
 //        System.out.println(sums.length);
