@@ -7,7 +7,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
@@ -82,50 +84,45 @@ public class ArrayManip {
         return maxSum;
     }    
     
-    static long arrayManipulation(int n, int[][] queries) {
-  
-        //0 = sum of beginings
-        //1 = sum of endings
-    		System.out.println("start0 " + n);
-        long [][] sums = new long[n + 1][2];
-        
-        System.out.println("start0 " + n);
-        //int max1 = Arrays.stream(queries).mapToInt(item -> item[1]).max().getAsInt();
-        for (int i = 0; i < queries.length; ++i) {
-        		sums[queries[i][0]][0] += queries[i][2];
-        		sums[queries[i][1]][1] += queries[i][2];
-        		
+	static long arrayManipulation(int n, int[][] queries) {
+		Map<Long, Long[]> sumsMap = new HashMap<Long, Long[]>(queries.length * 2);
 
-        		
-//        		max1 = queries[i][1] > max1 ? queries[i][1] : max1;
-        }
-        
-        System.out.println("end0");
+		for (int i = 0; i < queries.length; ++i) {
+			if (sumsMap.get((long) queries[i][0]) == null) {
+				sumsMap.put(new Long(queries[i][0]), new Long[] { (long) queries[i][2], 0L });
+			} else {
+				long value = sumsMap.get((long) queries[i][0])[0];
+				long value2 = sumsMap.get((long) queries[i][0])[1];
+				Long[] array = new Long[] { value + queries[i][2], value2 };
+				sumsMap.put((long) queries[i][0], array);
+			}
 
+			if (sumsMap.get((long) queries[i][1]) == null) {
+				sumsMap.put(new Long(queries[i][1]), new Long[] { 0L, (long) queries[i][2] });
+			} else {
+				long value = sumsMap.get((long) queries[i][1])[0];
+				long value2 = sumsMap.get((long) queries[i][1])[1];
+				Long[] array = new Long[] { value, value2 + queries[i][2] };
+				sumsMap.put((long) queries[i][1], array);
+			}
+		}
 
-//        System.out.println(sums.length);
-        sums = (long [][])Arrays.stream(sums).filter(item -> item[0] > 0 || item[1] > 0).toArray(long [][]::new);     
-//        System.out.println(sums.length);
-        
-//        System.out.println("start");
-        long currentSum = 0;
-        long maxSum = 0;
-        for (int i = 0; i < sums.length; ++i) {
-        		if (sums[i][0] > 0) {
-        			currentSum += sums[i][0];        			
-        		}
-        		
-        		if (sums[i][1] > 0) {
-        			maxSum = currentSum > maxSum ? currentSum : maxSum;
-        			currentSum -= sums[i][1];
-        		}
-        }
-//        System.out.println("end");
-        
-        //System.out.println(maxSum);
+		long currentSum = 0;
+		long maxSum = 0;
+		for (Long key : sumsMap.keySet().stream().sorted().collect(Collectors.toList())) {
+			if (sumsMap.get(key)[0] > 0) {
+				currentSum += sumsMap.get(key)[0];
+			}
 
-        return maxSum;
-    }    
+			if (sumsMap.get(key)[1] > 0) {
+				maxSum = currentSum > maxSum ? currentSum : maxSum;
+				currentSum -= sumsMap.get(key)[1];
+			}
+		}
+
+		//System.out.println(maxSum);
+		return maxSum;
+	}
 
     static class ArrayKey {
         int start;
