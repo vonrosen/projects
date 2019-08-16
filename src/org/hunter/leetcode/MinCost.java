@@ -27,7 +27,73 @@ public class MinCost {
         }
     }
 
-    public int mincostTickets(int[] days, int[] costs) {
+    public int mincostTickets(int[] days, int[] costs) {    	
+    		int [] mem = new int[366];
+    		
+    		if (days.length == 1) {
+    			return costs[0];
+    		}
+
+    		for (int i = 1; i < mem.length; ++i) {
+    			if (i == days[days.length - 1]) {
+    				break;
+    			}
+    			
+    			boolean paid = false;
+    			for (int d = 0; d < days.length; ++d) {
+    				if (days[d] == i) {
+    					if (mem[i] > 0) {
+    						paid = true;
+    					}
+    				}
+    			}
+    			
+    			if (paid) {
+    				continue;
+    			}
+    			
+    			for (int j = 0; j < costs.length; ++j) {
+    				if (j == 0) {
+    					if (mem[i] == 0) {
+    						mem[i] = mem[i - 1] + costs[j];
+    					}
+    					else {
+    						mem[i + 1] = mem[i] + costs[j];
+    					}
+    				}
+    				
+    				if (j == 1) {
+    					if (mem[i + 6] == 0) {
+    						mem[i + 6] = mem[i - 1] + costs[j];
+    					}
+    					else {
+    						mem[i + 6] = mem[i] + costs[j];
+    					}
+    				}    				
+    				
+    				if (j == 2) {
+    					if (mem[i + 29] == 0) {
+    						mem[i + 29] = mem[i - 1] + costs[j];
+    					}
+    					else {
+    						mem[i + 29] = mem[i] + costs[j];
+    					}
+    				}    				    				
+    			}
+    		}
+
+    		int min = mem[days[days.length - 1]];
+    		
+    		for (int i = days[days.length - 1]; i < mem.length; ++i) {
+    			if (mem[i] > 0) {
+    				min = min > mem[i] ? mem[i] : min;
+    			}    				
+    		}
+	    	
+    		return min;
+    }
+    
+    public int mincostTickets2(int[] days, int[] costs) {
         Node root = new Node();
         root.type = 1;
 
