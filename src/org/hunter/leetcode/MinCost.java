@@ -10,6 +10,8 @@ public class MinCost {
         System.out.println(m.mincostTickets(new int [] {1,4,6,7,8,20} , new int [] {2,7,15}));
         System.out.println(m.mincostTickets(new int [] {1,2,3,4,5,6,7,8,9,10,30,31} , new int [] {2,7,15}));
         System.out.println(m.mincostTickets(new int [] {1,2,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,20,21,24,25,27,28,29,30,31,34,37,38,39,41,43,44,45,47,48,49,54,57,60,62,63,66,69,70,72,74,76,78,80,81,82,83,84,85,88,89,91,93,94,97,99}, new int [] {9,38,134}));
+        System.out.println(m.mincostTickets(new int [] {1,4,6,7,8,365} , new int [] {2,7,15}));
+
 
     }
 
@@ -27,72 +29,61 @@ public class MinCost {
         }
     }
 
-    public int mincostTickets(int[] days, int[] costs) {    	
+    public int mincostTickets(int[] days, int[] costs) {
     		int [] mem = new int[366];
-    		
+
     		if (days.length == 1) {
     			return costs[0];
     		}
 
-    		for (int i = 1; i < mem.length; ++i) {
-    			if (i == days[days.length - 1]) {
-    				break;
-    			}
-    			
-    			boolean paid = false;
-    			for (int d = 0; d < days.length; ++d) {
-    				if (days[d] == i) {
-    					if (mem[i] > 0) {
-    						paid = true;
-    					}
-    				}
-    			}
-    			
-    			if (paid) {
-    				continue;
-    			}
-    			
+    		for (int i = 0; i < days.length; ++i) {
+    		    int day = days[i];
+
+    		    int last = i == 0 ? 0 : days[i - 1];
+
     			for (int j = 0; j < costs.length; ++j) {
     				if (j == 0) {
-    					if (mem[i] == 0) {
-    						mem[i] = mem[i - 1] + costs[j];
+    					if (mem[day] == 0) {
+    						mem[day] = mem[last] + costs[j];
     					}
     					else {
-    						mem[i + 1] = mem[i] + costs[j];
+    						mem[day + 1] = mem[day] + costs[j];
     					}
     				}
-    				
+
     				if (j == 1) {
-    					if (mem[i + 6] == 0) {
-    						mem[i + 6] = mem[i - 1] + costs[j];
-    					}
-    					else {
-    						mem[i + 6] = mem[i] + costs[j];
-    					}
-    				}    				
-    				
+    				    if (day + 6 < 366) {
+                            if (mem[day + 6] == 0) {
+                                mem[day + 6] = mem[last] + costs[j];
+                            }
+                            else {
+                                mem[day + 6] = mem[day] + costs[j];
+                            }
+    				    }
+    				}
+
     				if (j == 2) {
-    					if (mem[i + 29] == 0) {
-    						mem[i + 29] = mem[i - 1] + costs[j];
-    					}
-    					else {
-    						mem[i + 29] = mem[i] + costs[j];
-    					}
-    				}    				    				
+                        if (day + 29 < 366) {
+                            if (mem[day + 29] == 0) {
+                                mem[day + 29] = mem[last] + costs[j];
+                            }
+                            else {
+                                mem[day + 29] = mem[day] + costs[j];
+                            }
+                        }
+    				}
     			}
+
+                if (i == days[days.length - 1]) {
+                    break;
+                }
     		}
 
-    		int min = mem[days[days.length - 1]];
-    		
-    		for (int i = days[days.length - 1]; i < mem.length; ++i) {
-    			if (mem[i] > 0) {
-    				min = min > mem[i] ? mem[i] : min;
-    			}    				
-    		}
-	    	
-    		return min;
+//    		System.out.println("mc: " + mem[days[days.length - 1]]);
+
+    		return mem[days[days.length - 1]];
     }
-    
+
     public int mincostTickets2(int[] days, int[] costs) {
         Node root = new Node();
         root.type = 1;
