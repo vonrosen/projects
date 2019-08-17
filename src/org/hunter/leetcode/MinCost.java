@@ -7,12 +7,12 @@ public class MinCost {
 
     public static void main(String [] args) {
         MinCost m = new MinCost();
-        System.out.println(m.mincostTickets(new int [] {1,4,6,7,8,20} , new int [] {2,7,15}));
-        System.out.println(m.mincostTickets(new int [] {1,2,3,4,5,6,7,8,9,10,30,31} , new int [] {2,7,15}));
-        System.out.println(m.mincostTickets(new int [] {1,2,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,20,21,24,25,27,28,29,30,31,34,37,38,39,41,43,44,45,47,48,49,54,57,60,62,63,66,69,70,72,74,76,78,80,81,82,83,84,85,88,89,91,93,94,97,99}, new int [] {9,38,134}));
-        System.out.println(m.mincostTickets(new int [] {1,4,6,7,8,365} , new int [] {2,7,15}));
-
-
+//        System.out.println(m.mincostTickets(new int [] {1,4,6,7,8,20} , new int [] {2,7,15}));
+//        System.out.println(m.mincostTickets(new int [] {1,2,3,4,5,6,7,8,9,10,30,31} , new int [] {2,7,15}));
+//        System.out.println(m.mincostTickets(new int [] {1,2,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,20,21,24,25,27,28,29,30,31,34,37,38,39,41,43,44,45,47,48,49,54,57,60,62,63,66,69,70,72,74,76,78,80,81,82,83,84,85,88,89,91,93,94,97,99}, new int [] {9,38,134}));
+//        System.out.println(m.mincostTickets(new int [] {1,4,6,7,8,365} , new int [] {2,7,15}));
+//        System.out.println(m.mincostTickets(new int [] {1,3,7} , new int [] {1,4,20}));
+        System.out.println(m.mincostTickets(new int [] {1,4,6,9,10,11,12,13,14,15,16,17,18,20,21,22,23,27,28} , new int [] {3,13,45})); //44
     }
 
     static class Node {
@@ -47,6 +47,7 @@ public class MinCost {
     						mem[day] = mem[last] + costs[j];
     					}
     					else {
+    					    mem[day] = mem[day] < mem[last] + costs[j] ? mem[day] : mem[last] + costs[j];
     						mem[day + 1] = mem[day] + costs[j];
     					}
     				}
@@ -57,6 +58,7 @@ public class MinCost {
                                 mem[day + 6] = mem[last] + costs[j];
                             }
                             else {
+                                mem[day] = mem[day] < mem[last] + costs[j] ? mem[day] : mem[last] + costs[j];
                                 mem[day + 6] = mem[day] + costs[j];
                             }
     				    }
@@ -68,6 +70,7 @@ public class MinCost {
                                 mem[day + 29] = mem[last] + costs[j];
                             }
                             else {
+                                mem[day] = mem[day] < mem[last] + costs[j] ? mem[day] : mem[last] + costs[j];
                                 mem[day + 29] = mem[day] + costs[j];
                             }
                         }
@@ -78,8 +81,6 @@ public class MinCost {
                     break;
                 }
     		}
-
-//    		System.out.println("mc: " + mem[days[days.length - 1]]);
 
     		return mem[days[days.length - 1]];
     }
