@@ -4,7 +4,7 @@ public class BitCount {
 
     public static void main(String [] args) {
         BitCount b = new BitCount();
-        int [] counts = b.countBits(8);//[0,1,1,2,1,2,2,3,1]
+        int [] counts = b.countBits(16);//[0,1,1,2,1,2,2,3,1]
         for (int i = 0; i < counts.length; ++i) {
             System.out.println(counts[i]);
         }
@@ -27,6 +27,11 @@ public class BitCount {
                 if (bin.charAt(j) == '0') {
                     replaced = true;
                     bin.replace(j, j + 1, "1");
+                    if (j < bin.length() - 1) {
+                        for (int k = j + 1; k < bin.length(); ++k) {
+                            bin.replace(k, k + 1, "0");
+                        }
+                    }
                     break;
                 }
             }
