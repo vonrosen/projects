@@ -14,7 +14,6 @@ public class UniquePaths {
         System.out.println(u.uniquePaths(23, 12));
     }
 
-
     //m=across, n=down
     public int uniquePaths(int m, int n) {
 
