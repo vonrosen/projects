@@ -19,28 +19,22 @@ public class NumTrees {
     public int numTrees(int n) {
     		int numTrees1 = 1;
     		int numTrees2 = 2;
-    		int numTrees3 = 5;
     		
     		if (n == 1) {
     			return numTrees1;		
     		}
     		
     		if (n == 2) {
-    			return numTrees2;    		
-    		}
-    		
-    		if (n == 3) {
-    			return numTrees3;
-    		}
+    			return numTrees2;		
+    		}    		
     		
     		int [] nTrees = new int[n + 1];
     		nTrees[0] = 0;
     		nTrees[1] = numTrees1;
     		nTrees[2] = numTrees2;
-    		nTrees[3] = numTrees3;
     		
     		int count = 0;
-    		for (int i = 4; i <= n; ++i) {
+    		for (int i = 3; i <= n; ++i) {
     			count = 0;
         		for (int k = 1; k <= i; ++k) {
         			int left = k - 1;
