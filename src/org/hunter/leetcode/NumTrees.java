@@ -7,13 +7,63 @@ public class NumTrees {
 
     public static void main(String [] args) {
         NumTrees n = new NumTrees();
-//        System.out.println(n.numTrees(1));
-//        System.out.println(n.numTrees(3));
-//        System.out.println(n.numTrees(4));//14
+        System.out.println(n.numTrees(1));
+        System.out.println(n.numTrees(3));//5
+        System.out.println(n.numTrees(4));//14
         System.out.println(n.numTrees(5));//42
+        System.out.println(n.numTrees(6));        //132
+        System.out.println(n.numTrees(7));        //429
     }
 
+    
     public int numTrees(int n) {
+    		int numTrees1 = 1;
+    		int numTrees2 = 2;
+    		int numTrees3 = 5;
+    		
+    		if (n == 1) {
+    			return numTrees1;		
+    		}
+    		
+    		if (n == 2) {
+    			return numTrees2;    		
+    		}
+    		
+    		if (n == 3) {
+    			return numTrees3;
+    		}
+    		
+    		int [] nTrees = new int[n + 1];
+    		nTrees[0] = 0;
+    		nTrees[1] = numTrees1;
+    		nTrees[2] = numTrees2;
+    		nTrees[3] = numTrees3;
+    		
+    		int count = 0;
+    		for (int i = 4; i <= n; ++i) {
+    			count = 0;
+        		for (int k = 1; k <= i; ++k) {
+        			int left = k - 1;
+        			int right = i - k;
+        			
+        			if (left == 0 || left == 1) {
+        				count += nTrees[right];
+        			}        			
+        			else if (right == 0 || right == 1) {
+        				count += nTrees[left];
+        			}            			
+        			else {
+        				count += nTrees[right] * nTrees[left];
+        			}        			
+        		}
+        		
+        		nTrees[i] = count;
+    		}
+    		
+    		return nTrees[n];
+    }
+    
+    public int numTrees2(int n) {
         int count = 0;
         Set<Integer> s = new HashSet<Integer>();
 
@@ -50,7 +100,7 @@ public class NumTrees {
 
     public int cc(int left, int right, int i, int n) {
 
-        int count = cc(left, )
+        return 1;
 
 
     }
