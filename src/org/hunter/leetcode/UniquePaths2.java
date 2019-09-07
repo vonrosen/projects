@@ -1,4 +1,4 @@
-package org.hunter.hackerrank;
+package org.hunter.leetcode;
 
 public class UniquePaths2 {
 
