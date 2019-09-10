@@ -15,7 +15,6 @@ public class NumTrees {
         System.out.println(n.numTrees(7));        //429
     }
 
-    
     public int numTrees(int n) {
     		int numTrees1 = 1;
     		int numTrees2 = 2;
