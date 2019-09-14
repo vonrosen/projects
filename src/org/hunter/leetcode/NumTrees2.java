@@ -1,7 +1,9 @@
 package org.hunter.leetcode;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class NumTrees2 {
 
@@ -14,7 +16,7 @@ public class NumTrees2 {
 //		System.out.println(n.generateTrees(6).size()); // 132
 //		System.out.println(n.generateTrees(7).size()); // 429
 	}
-	
+
 	static class TreeNode {
 		int val;
 		TreeNode left;
@@ -23,13 +25,72 @@ public class NumTrees2 {
 		TreeNode(int x) {
 			val = x;
 		}
-		
-		public String toString() {
+
+		@Override
+        public String toString() {
 			return String.valueOf(val);
 		}
-	}    
+	}
 
 	public List<TreeNode> generateTrees(int n) {
+        List<List<TreeNode>> mem = new ArrayList<List<TreeNode>>(n + 1);
+        mem.add(new <TreeNode>ArrayList());
+
+        Map<String, List<TreeNode>> map = new HashMap<String, List<TreeNode>>();
+
+        generateTrees3(n, mem, map);
+
+        return mem.get(n);
+	}
+
+	public List<TreeNode> generateTrees3(int n, List<List<TreeNode>> mem, Map<String, List<TreeNode>> map) {
+        List<TreeNode> list = new ArrayList<TreeNode>();
+
+	    if (n == 1) {
+	        if (mem.get(1) == null) {
+	            list.add(new TreeNode(n));
+	            mem.add(list);
+	        }
+
+	        return mem.get(1);
+	    }
+	    else {
+	        for (int i = 1; i <= n; ++i) {
+	            for (int k = 1; k <= i; ++k) {
+	                if (k - 1 > 0) {
+	                    for (TreeNode t : generateTrees3(k - 1, mem, map)) {
+	                        TreeNode root = new TreeNode(k);
+	                        root.left = t;
+	                        list.add(root);
+	                    }
+	                }
+
+	                if (i - k > 0) {
+	                    if (i - k == 1) {
+	                        TreeNode root = new TreeNode(k);
+	                        root.right = new TreeNode(k + (i - k));
+	                        list.add(root);
+	                    }
+	                    else {
+	                        for (int j = k + (i - k); j <= i; ++j) {
+	                            TreeNode root = null;
+	                            for (TreeNode t : mem.get(n - 1)) {
+	                                if (t.val == j) {
+	                                    //TODO
+
+	                                }
+	                            }
+	                        }
+	                    }
+	                }
+	            }
+
+	            mem.add(list);
+	        }
+	    }
+	}
+
+	public List<TreeNode> generateTrees2(int n) {
 		TreeNode tree1 = new TreeNode(1);
 		List<TreeNode> list1 = new ArrayList<TreeNode>();
 		list1.add(tree1);
