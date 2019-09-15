@@ -8,8 +8,8 @@ public class NumTrees2 {
 	public static void main(String[] args) {
 		NumTrees2 n = new NumTrees2();
 //		System.out.println(n.generateTrees(1).size());
-		System.out.println(n.generateTrees(3).size());// 5
-//		System.out.println(n.generateTrees(4).size());// 14
+//		System.out.println(n.generateTrees(3));// 5
+		System.out.println(n.generateTrees(4));// 14
 //		System.out.println(n.generateTrees(5).size());// 42
 //		System.out.println(n.generateTrees(6).size()); // 132
 //		System.out.println(n.generateTrees(7).size()); // 429
@@ -47,34 +47,49 @@ public class NumTrees2 {
         for (int i = 2; i <= n; ++i) {
             List<TreeNode> list = new ArrayList<TreeNode>();
             for (int k = 1; k <= i; ++k) {
-                if (k - 1 > 0) {
-                    for (TreeNode t : mem.get(k - 1)) {
-                        TreeNode root = new TreeNode(k);
-                        root.left = t;
-                        list.add(root);
-                    }
-                }
-
-                if (i - k > 0) {
+                if (k == 1) {
                     if (i - k == 1) {
                         TreeNode root = new TreeNode(k);
-                        root.right = new TreeNode(k + (i - k));
+                        root.right = new TreeNode(k + 1);
                         list.add(root);
                     }
                     else {
                         //i = 3
                         //k = 1
                         for (TreeNode t : mem.get(i - 1)) {
-                            if (t.val == k) {
-                                TreeNode copy1 = copy(t);
-                                insertLastRight(copy1, new TreeNode(i));
-                                list.add(copy1);
+                            TreeNode root = new TreeNode(k);
+                            root.right = copyAndIncrement(t, 1);
+                            list.add(root);
+                        }
+                    }
+                }
+                else if (k == i) {
+                    for (TreeNode t : mem.get(i - 1)) {
+                        TreeNode root = new TreeNode(k);
+                        root.left = t;
+                        list.add(root);
+                    }
+                }
+                else {
+                    for (TreeNode t : mem.get(k - 1)) {
+                        TreeNode root = new TreeNode(k);
+                        root.left = t;
 
-                                TreeNode copy2 = copy(t);
-                                TreeNode copy2Right = new TreeNode(i);
-                                copy2Right.left = copy2.right;
-                                copy2.right = copy2Right;
-                                list.add(copy2);
+                        if (i - k == 1) {
+                            root.right = new TreeNode(k + 1);
+                            list.add(root);
+                        }
+                        else {
+                            //i = 3
+                            //k = 1
+                            for (TreeNode t2 : mem.get(i - k)) {
+                                if (root.right != null) {
+                                    TreeNode copyLeft = copyAndIncrement(root.left, 0);
+                                    root = new TreeNode(k);
+                                    root.left = copyLeft;
+                                }
+                                root.right = copyAndIncrement(t2, k);
+                                list.add(root);
                             }
                         }
                     }
@@ -87,135 +102,16 @@ public class NumTrees2 {
 	    return mem.get(n);
 	}
 
-	public void insertLastRight(TreeNode treeNode, TreeNode newNode) {
-	    if (treeNode == null) {
-	        return;
-	    }
+	public TreeNode copyAndIncrement(TreeNode t, int increaseBy) {
+        if (t == null) {
+            return null;
+        }
 
-	    if (treeNode.right == null) {
-	        treeNode.right = newNode;
-	        return;
-	    }
-	    else {
-	        insertLastRight(treeNode.right, newNode);
-	    }
-    }
+        TreeNode c = new TreeNode(t.val + increaseBy);
 
-    public TreeNode copy(TreeNode t) {
-	    if (t == null) {
-	        return null;
-	    }
-
-	    TreeNode c = new TreeNode(t.val);
-
-	    c.left = copy(t.left);
-	    c.right = copy(t.right);
+        c.left = copyAndIncrement(t.left, increaseBy);
+        c.right = copyAndIncrement(t.right, increaseBy);
 
         return c;
     }
-
-    public List<TreeNode> generateTrees2(int n) {
-		TreeNode tree1 = new TreeNode(1);
-		List<TreeNode> list1 = new ArrayList<TreeNode>();
-		list1.add(tree1);
-		TreeNode tree2 = new TreeNode(1);
-		tree2.right = new TreeNode(2);
-		TreeNode tree22 = new TreeNode(2);
-		tree22.left = new TreeNode(1);
-		List<TreeNode> list2 = new ArrayList<TreeNode>();
-		list2.add(tree2);
-		list2.add(tree22);
-
-		if (n == 1) {
-			return list1;
-		}
-
-		if (n == 2) {
-			return list2;
-		}
-
-		List<List<TreeNode>> mem = new ArrayList<List<TreeNode>>(n + 1);
-		mem.add(new <TreeNode>ArrayList());
-		mem.add(list1);
-		mem.add(list2);
-
-		for (int i = 3; i <= n; ++i) {
-			List<TreeNode> list = new ArrayList<TreeNode>();
-
-			for (int k = 1; k <= i; ++k) {
-				int left = k - 1;
-				int right = i - k;
-
-				if (left == 0 || left == 1) {
-					for (TreeNode tree : mem.get(right)) {
-						TreeNode t = new TreeNode(k);
-						t.right = tree;
-						list.add(t);
-					}
-				} else if (right == 0 || right == 1) {
-					for (TreeNode tree : mem.get(left)) {
-						TreeNode t = new TreeNode(k);
-						t.left = tree;
-						list.add(t);
-					}
-				} else {
-					List<TreeNode> list3 = new ArrayList<TreeNode>();
-
-					for (TreeNode tree : mem.get(right)) {
-						for (TreeNode tree3 : mem.get(left)) {
-							TreeNode t = new TreeNode(k);
-							t.right = tree;
-							t.left = tree3;
-							list3.add(t);
-						}
-					}
-
-					list.addAll(list3);
-				}
-			}
-
-			mem.add(list);
-		}
-
-		return mem.get(n);
-	}
-
-	public int numTrees(int n) {
-		int numTrees1 = 1;
-		int numTrees2 = 2;
-
-		if (n == 1) {
-			return numTrees1;
-		}
-
-		if (n == 2) {
-			return numTrees2;
-		}
-
-		int[] nTrees = new int[n + 1];
-		nTrees[0] = 0;
-		nTrees[1] = numTrees1;
-		nTrees[2] = numTrees2;
-
-		int count = 0;
-		for (int i = 3; i <= n; ++i) {
-			count = 0;
-			for (int k = 1; k <= i; ++k) {
-				int left = k - 1;
-				int right = i - k;
-
-				if (left == 0 || left == 1) {
-					count += nTrees[right];
-				} else if (right == 0 || right == 1) {
-					count += nTrees[left];
-				} else {
-					count += nTrees[right] * nTrees[left];
-				}
-			}
-
-			nTrees[i] = count;
-		}
-
-		return nTrees[n];
-	}
 }
