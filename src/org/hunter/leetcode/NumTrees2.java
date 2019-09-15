@@ -1,9 +1,7 @@
 package org.hunter.leetcode;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class NumTrees2 {
 
@@ -36,61 +34,87 @@ public class NumTrees2 {
         List<List<TreeNode>> mem = new ArrayList<List<TreeNode>>(n + 1);
         mem.add(new <TreeNode>ArrayList());
 
-        Map<String, List<TreeNode>> map = new HashMap<String, List<TreeNode>>();
-
-        generateTrees3(n, mem, map);
+        generateTrees3(n, mem);
 
         return mem.get(n);
 	}
 
-	public List<TreeNode> generateTrees3(int n, List<List<TreeNode>> mem, Map<String, List<TreeNode>> map) {
-        List<TreeNode> list = new ArrayList<TreeNode>();
+	public List<TreeNode> generateTrees3(int n, List<List<TreeNode>> mem) {
+        List<TreeNode> list2 = new ArrayList<TreeNode>();
+        list2.add(new TreeNode(1));
+        mem.add(list2);
 
-	    if (n == 1) {
-	        if (mem.get(1) == null) {
-	            list.add(new TreeNode(n));
-	            mem.add(list);
-	        }
+        for (int i = 2; i <= n; ++i) {
+            List<TreeNode> list = new ArrayList<TreeNode>();
+            for (int k = 1; k <= i; ++k) {
+                if (k - 1 > 0) {
+                    for (TreeNode t : mem.get(k - 1)) {
+                        TreeNode root = new TreeNode(k);
+                        root.left = t;
+                        list.add(root);
+                    }
+                }
 
-	        return mem.get(1);
-	    }
-	    else {
-	        for (int i = 1; i <= n; ++i) {
-	            for (int k = 1; k <= i; ++k) {
-	                if (k - 1 > 0) {
-	                    for (TreeNode t : generateTrees3(k - 1, mem, map)) {
-	                        TreeNode root = new TreeNode(k);
-	                        root.left = t;
-	                        list.add(root);
-	                    }
-	                }
+                if (i - k > 0) {
+                    if (i - k == 1) {
+                        TreeNode root = new TreeNode(k);
+                        root.right = new TreeNode(k + (i - k));
+                        list.add(root);
+                    }
+                    else {
+                        //i = 3
+                        //k = 1
+                        for (TreeNode t : mem.get(i - 1)) {
+                            if (t.val == k) {
+                                TreeNode copy1 = copy(t);
+                                insertLastRight(copy1, new TreeNode(i));
+                                list.add(copy1);
 
-	                if (i - k > 0) {
-	                    if (i - k == 1) {
-	                        TreeNode root = new TreeNode(k);
-	                        root.right = new TreeNode(k + (i - k));
-	                        list.add(root);
-	                    }
-	                    else {
-	                        for (int j = k + (i - k); j <= i; ++j) {
-	                            TreeNode root = null;
-	                            for (TreeNode t : mem.get(n - 1)) {
-	                                if (t.val == j) {
-	                                    //TODO
+                                TreeNode copy2 = copy(t);
+                                TreeNode copy2Right = new TreeNode(i);
+                                copy2Right.left = copy2.right;
+                                copy2.right = copy2Right;
+                                list.add(copy2);
+                            }
+                        }
+                    }
+                }
+            }
 
-	                                }
-	                            }
-	                        }
-	                    }
-	                }
-	            }
+            mem.add(list);
+        }
 
-	            mem.add(list);
-	        }
-	    }
+	    return mem.get(n);
 	}
 
-	public List<TreeNode> generateTrees2(int n) {
+	public void insertLastRight(TreeNode treeNode, TreeNode newNode) {
+	    if (treeNode == null) {
+	        return;
+	    }
+
+	    if (treeNode.right == null) {
+	        treeNode.right = newNode;
+	        return;
+	    }
+	    else {
+	        insertLastRight(treeNode.right, newNode);
+	    }
+    }
+
+    public TreeNode copy(TreeNode t) {
+	    if (t == null) {
+	        return null;
+	    }
+
+	    TreeNode c = new TreeNode(t.val);
+
+	    c.left = copy(t.left);
+	    c.right = copy(t.right);
+
+        return c;
+    }
+
+    public List<TreeNode> generateTrees2(int n) {
 		TreeNode tree1 = new TreeNode(1);
 		List<TreeNode> list1 = new ArrayList<TreeNode>();
 		list1.add(tree1);
