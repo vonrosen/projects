@@ -15,6 +15,17 @@ public class ShortestPathColors {
     public static void main(String [] args) {
         ShortestPathColors s = new ShortestPathColors();
 
+//        9
+//        [[1,8],[5,7],[1,2],[2,2],[7,4],[7,2],[3,8],[7,0],[1,5],[2,7],[2,3],[6,3],[3,0],[4,8],[7,5],[1,6],[3,7]]
+//        [[2,1],[1,4],[0,3],[0,5],[1,5],[8,2],[5,8],[2,6],[5,3],[6,7],[4,0],[2,2]]        
+        //exp: [0,5,3,1,8,1,5,2,2]
+
+      int n = 9;
+		int[][] red_edges = new int[][] { { 1, 8 }, { 5, 7 }, { 1, 2 }, { 2, 2 }, { 7, 4 }, { 7, 2 }, { 3, 8 },
+				{ 7, 0 }, { 1, 5 }, { 2, 7 }, { 2, 3 }, { 6, 3 }, { 3, 0 }, { 4, 8 }, { 7, 5 }, { 1, 6 }, { 3, 7 } };
+		int[][] blue_edges = new int[][] { { 2, 1 }, { 1, 4 }, { 0, 3 }, { 0, 5 }, { 1, 5 }, { 8, 2 }, { 5, 8 },
+				{ 2, 6 }, { 5, 3 }, { 6, 7 }, { 4, 0 }, { 2, 2 } };        
+        
 //        int n = 9;
 //        int [][] red_edges = new int[][]
 //                  {{2,1},{5,1},{6,4},{1,0},{7,4},{0,8},{7,8},{7,6},{6,8},{3,1},{2,7},{3,6},{8,3},{0,0},{5,0},{8,1},{4,8},{4,7},{8,0},{8,5}};
@@ -81,28 +92,28 @@ public class ShortestPathColors {
         //exp: [0,1,3,-1,4,3]
 
         
-        int n = 6;
-        int [][] red_edges = new int[][] {
-            {1, 5},
-            {2, 2},
-            {5, 5},
-            {3, 0},
-            {4, 5},
-            {2, 4},
-            {4, 1},
-            {1, 0},
-            {1, 2},
-            {5, 2},
-            {2, 3},
-            {0, 1}
-        };
-        int [][] blue_edges = new int[][] {
-            {4, 4},
-            {2, 5},
-            {1, 1},
-            {5, 4},
-            {3, 3}
-        };                  
+//        int n = 6;
+//        int [][] red_edges = new int[][] {
+//            {1, 5},
+//            {2, 2},
+//            {5, 5},
+//            {3, 0},
+//            {4, 5},
+//            {2, 4},
+//            {4, 1},
+//            {1, 0},
+//            {1, 2},
+//            {5, 2},
+//            {2, 3},
+//            {0, 1}
+//        };
+//        int [][] blue_edges = new int[][] {
+//            {4, 4},
+//            {2, 5},
+//            {1, 1},
+//            {5, 4},
+//            {3, 3}
+//        };                  
         
         
 //            int n = 5;
@@ -181,10 +192,10 @@ public class ShortestPathColors {
                 			int tmpResult = blueCache.get(blue_edges[b][0] + "-" + blue_edges[b][1]);
     	                    if (tmpResult > 0) {
     	                        if (result == -1) {
-    	                            result = tmpResult + hops;
+    	                            result = tmpResult;
     	                        }
     	                        else {
-    	                            result = tmpResult  + hops < result ? tmpResult + hops: result;
+    	                            result = Math.min(tmpResult, result);
     	                        }
     	                    }                			
                 		}
@@ -197,14 +208,22 @@ public class ShortestPathColors {
 	                            result = tmpResult;
 	                        }
 	                        else {
-	                            result = tmpResult < result ? tmpResult : result;
+	                            result = Math.min(tmpResult, result);
 	                        }
 	                    }                    
                 		}
                 }
             }
-
-            redCache.put(edge[0] + "-" + edge[1], result);
+            
+//            if (redCache.get(edge[0] + "-" + edge[1]) != null) {
+//            		System.out.println("sasf");
+//            }
+            
+            if (edge[0] == 1 && edge[1] == 2) {
+            		System.out.println("asdf");
+            }
+            
+            redCache.put(edge[0] + "-" + edge[1], result > 0 ? result - hops + 1: result);
             return result;
         }
     }
@@ -227,10 +246,10 @@ public class ShortestPathColors {
 	            			int tmpResult = redCache.get(red_edges[r][0] + "-" + red_edges[r][1]);
 	                    if (tmpResult > 0) {
 	                        if (result == -1) {
-	                            result = tmpResult + hops;
+	                            result = tmpResult;
 	                        }
 	                        else {
-	                            result = tmpResult + hops < result ? tmpResult + hops : result;
+	                            result = Math.min(tmpResult, result);
 	                        }
 	                    }                			
 	            		}
@@ -243,14 +262,14 @@ public class ShortestPathColors {
 	                            result = tmpResult;
 	                        }
 	                        else {
-	                            result = tmpResult < result ? tmpResult : result;
+	                        		result = Math.min(tmpResult, result);
 	                        }
 	                    }
 	            		}
                 }
             }
-
-            blueCache.put(edge[0] + "-" + edge[1], result);
+            
+            blueCache.put(edge[0] + "-" + edge[1], result > 0 ? result - hops + 1: result);
             return result;
         }
     }
@@ -259,7 +278,7 @@ public class ShortestPathColors {
         int [] result = new int[n];
         Arrays.fill(result, -1);
 
-        for (int to = 0; to < n; ++to) {
+        for (int to = 0; to <= n; ++to) {
             if (to == 0) {
                 result[to] = 0;
             }
@@ -275,6 +294,8 @@ public class ShortestPathColors {
                                 result[to] = hops;
                             }
                         }
+                        
+//                        redCache.put(red_edges[r][0] + "-" + red_edges[r][1], result[to]);
                     }
                 }
 
@@ -288,6 +309,8 @@ public class ShortestPathColors {
                             else {
                                 result[to] = hops;
                             }
+                            
+//                            blueCache.put(blue_edges[b][0] + "-" + blue_edges[b][1], result[to]);
                         }
                     }
                 }
