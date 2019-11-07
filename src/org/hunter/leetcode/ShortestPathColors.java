@@ -20,7 +20,7 @@ public class ShortestPathColors {
 //        [[2,1],[1,4],[0,3],[0,5],[1,5],[8,2],[5,8],[2,6],[5,3],[6,7],[4,0],[2,2]]        
         //exp: [0,5,3,1,8,1,5,2,2]
 
-      int n = 9;
+        int n = 9;
 		int[][] red_edges = new int[][] { { 1, 8 }, { 5, 7 }, { 1, 2 }, { 2, 2 }, { 7, 4 }, { 7, 2 }, { 3, 8 },
 				{ 7, 0 }, { 1, 5 }, { 2, 7 }, { 2, 3 }, { 6, 3 }, { 3, 0 }, { 4, 8 }, { 7, 5 }, { 1, 6 }, { 3, 7 } };
 		int[][] blue_edges = new int[][] { { 2, 1 }, { 1, 4 }, { 0, 3 }, { 0, 5 }, { 1, 5 }, { 8, 2 }, { 5, 8 },
@@ -180,6 +180,11 @@ public class ShortestPathColors {
         }
 
         int redStart = edge[0];
+        
+        if (redCache.get(edge[0] + "-" + edge[1]) != null) {
+        		int r = redCache.get(edge[0] + "-" + edge[1]);
+        		return r > 0 ? r + hops - 1 : r;
+        }
 
         if (redStart == 0) {
             return hops;
@@ -188,42 +193,25 @@ public class ShortestPathColors {
             int result = -1;
             for (int b = 0; b < blue_edges.length; ++b) {
                 if (blue_edges[b][1] == redStart) {
-                		if (blueCache.get(blue_edges[b][0] + "-" + blue_edges[b][1]) != null) {
-                			int tmpResult = blueCache.get(blue_edges[b][0] + "-" + blue_edges[b][1]);
-    	                    if (tmpResult > 0) {
-    	                        if (result == -1) {
-    	                            result = tmpResult;
-    	                        }
-    	                        else {
-    	                            result = Math.min(tmpResult, result);
-    	                        }
-    	                    }                			
-                		}
-                		else {
-	                    redGuard.put(edge[0] + "-" + edge[1], true);
-	                    int tmpResult = getHopsFromBlue(blue_edges[b], blue_edges, red_edges, hops + 1);
-	                    redGuard.remove(edge[0] + "-" + edge[1]);
-	                    if (tmpResult > 0) {
-	                        if (result == -1) {
-	                            result = tmpResult;
-	                        }
-	                        else {
-	                            result = Math.min(tmpResult, result);
-	                        }
-	                    }                    
-                		}
+                    redGuard.put(edge[0] + "-" + edge[1], true);
+                    int tmpResult = getHopsFromBlue(blue_edges[b], blue_edges, red_edges, hops + 1);
+                    redGuard.remove(edge[0] + "-" + edge[1]);
+                    if (tmpResult > 0) {
+                        if (result == -1) {
+                            result = tmpResult;
+                        }
+                        else {
+                            result = Math.min(tmpResult, result);
+                        }
+                    }                    
                 }
             }
             
-//            if (redCache.get(edge[0] + "-" + edge[1]) != null) {
-//            		System.out.println("sasf");
-//            }
-            
             if (edge[0] == 1 && edge[1] == 2) {
-            		System.out.println("asdf");
+            		System.out.println("alsdfj");
             }
             
-            redCache.put(edge[0] + "-" + edge[1], result > 0 ? result - hops + 1: result);
+            redCache.put(edge[0] + "-" + edge[1], result > 0 ? result - hops + 1	: result);
             return result;
         }
     }
@@ -233,39 +221,36 @@ public class ShortestPathColors {
             return -1;
         }
 
+        if (edge[0] == 6 && edge[1] == 7) {
+        		System.out.println("asdfasfsss");
+        }
+        
+        if (blueCache.get(edge[0] + "-" + edge[1]) != null) {
+    			int r = blueCache.get(edge[0] + "-" + edge[1]);
+    			return r > 0 ? r + hops - 1 : r;
+        }
+        
         int blueStart = edge[0];
 
         if (blueStart == 0) {
             return hops;
         }
         else {
+        	
             int result = -1;
             for (int r = 0; r < red_edges.length; ++r) {
                 if (red_edges[r][1] == blueStart) {
-	            		if (redCache.get(red_edges[r][0] + "-" + red_edges[r][1]) != null) {
-	            			int tmpResult = redCache.get(red_edges[r][0] + "-" + red_edges[r][1]);
-	                    if (tmpResult > 0) {
-	                        if (result == -1) {
-	                            result = tmpResult;
-	                        }
-	                        else {
-	                            result = Math.min(tmpResult, result);
-	                        }
-	                    }                			
-	            		}
-	            		else {
-	                    blueGuard.put(edge[0] + "-" + edge[1], true);
-	                    int tmpResult = getHopsFromRed(red_edges[r], blue_edges, red_edges, hops + 1);
-	                    blueGuard.remove(edge[0] + "-" + edge[1]);
-	                    if (tmpResult > 0) {
-	                        if (result == -1) {
-	                            result = tmpResult;
-	                        }
-	                        else {
-	                        		result = Math.min(tmpResult, result);
-	                        }
-	                    }
-	            		}
+                    blueGuard.put(edge[0] + "-" + edge[1], true);
+                    int tmpResult = getHopsFromRed(red_edges[r], blue_edges, red_edges, hops + 1);
+                    blueGuard.remove(edge[0] + "-" + edge[1]);
+                    if (tmpResult > 0) {
+                        if (result == -1) {
+                            result = tmpResult;
+                        }
+                        else {
+                        		result = Math.min(tmpResult, result);
+                        }
+                    }
                 }
             }
             
@@ -292,10 +277,8 @@ public class ShortestPathColors {
                             }
                             else {
                                 result[to] = hops;
-                            }
+                            }                            
                         }
-                        
-//                        redCache.put(red_edges[r][0] + "-" + red_edges[r][1], result[to]);
                     }
                 }
 
@@ -309,8 +292,6 @@ public class ShortestPathColors {
                             else {
                                 result[to] = hops;
                             }
-                            
-//                            blueCache.put(blue_edges[b][0] + "-" + blue_edges[b][1], result[to]);
                         }
                     }
                 }
