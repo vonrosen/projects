@@ -313,6 +313,7 @@ public class ShortestPathColors {
             for (int r = 0; r < red_edges.length; ++r) {
                 if (red[red_edges[r][0]][red_edges[r][1]] == 0 && red_edges[r][0] == 0) {
                     red[red_edges[r][0]][red_edges[r][1]] = 1;
+                    results[red_edges[r][1]] = 1;
                 }
 
                 for (int rr = 0; rr < red.length; ++rr) {
@@ -323,14 +324,15 @@ public class ShortestPathColors {
                         else {
                             red[red_edges[r][0]][red_edges[r][1]] = Math.max(red[rr][red_edges[r][0]] + 1, red[red_edges[r][0]][red_edges[r][1]]);
                         }
+                        
+                        if (red[red_edges[r][0]][red_edges[r][1]] > 0) {
+                    			if (results[red_edges[r][1]] == 0) {
+                    				results[red_edges[r][1]] = red[red_edges[r][0]][red_edges[r][1]]; 
+                    			}
+                        }
+                        
                     }
-                }
-                
-                if (red[red_edges[r][0]][red_edges[r][1]] > 0) {
-                		if (results[red_edges[r][1]] == 0) {
-                			results[red_edges[r][1]] = red[red_edges[r][0]][red_edges[r][1]]; 
-                		}
-                }
+                }                
             }
 
             for (int b = 0; b < blue_edges.length; ++b) {
@@ -343,20 +345,21 @@ public class ShortestPathColors {
                             red[blue_edges[b][0]][blue_edges[b][1]] =
                                     Math.max(red[blue_edges[b][0]][blue_edges[b][1]], red[r][blue_edges[b][0]] + 1);
                         }
+                        
+                        if (red[blue_edges[b][0]][blue_edges[b][1]] > 0) {
+                				if (results[blue_edges[b][1]] == 0) {
+                					results[blue_edges[b][1]] = red[blue_edges[b][0]][blue_edges[b][1]]; 
+                				}
+                        }                                        
                     }
-                }
-                
-                if (red[blue_edges[b][0]][blue_edges[b][1]] > 0) {
-            			if (results[blue_edges[b][1]] == 0) {
-            				results[blue_edges[b][1]] = red[blue_edges[b][0]][blue_edges[b][1]]; 
-            			}
                 }                
             }
 
             //blue first graph
             for (int b = 0; b < blue_edges.length; ++b) {
                 if (blue[blue_edges[b][0]][blue_edges[b][1]] == 0 && blue_edges[b][0] == 0) {
-                    blue[blue_edges[b][0]][blue_edges[b][1]] = 1;
+                    blue[blue_edges[b][0]][blue_edges[b][1]] = 1;                    
+                    results[blue_edges[b][1]] = 1;
                 }
 
                 for (int bb = 0; bb < blue.length; ++bb) {
@@ -367,13 +370,13 @@ public class ShortestPathColors {
                         else {
                             blue[blue_edges[b][0]][blue_edges[b][1]] = Math.max(blue[bb][blue_edges[b][0]] + 1, blue[blue_edges[b][0]][blue_edges[b][1]]);                            
                         }
+                        
+                        if (blue[blue_edges[b][0]][blue_edges[b][1]] > 0) {
+                    			if (results[blue_edges[b][1]] == 0) {
+                    				results[blue_edges[b][1]] = blue[blue_edges[b][0]][blue_edges[b][1]]; 
+                    			}
+                        }                        
                     }
-                }
-                
-                if (blue[blue_edges[b][0]][blue_edges[b][1]] > 0) {
-                		if (results[blue_edges[b][1]] == 0) {
-                			results[blue_edges[b][1]] = blue[blue_edges[b][0]][blue_edges[b][1]]; 
-                		}
                 }
             }
             
@@ -388,9 +391,9 @@ public class ShortestPathColors {
                 for (int b = 0; b < blue.length; ++b) {
                     if (blue[b][red_edges[r][0]] > 0 && blue[b][red_edges[r][0]] % 2 != 0) {
                     	
-	                		if (blue[b][red_edges[r][0]] == 0 && blue[b][red_edges[r][1]] == 4) {
-	                			System.out.println("asfadsf34");
-	                		}                    	
+//	                		if (blue[b][red_edges[r][0]] == 0 && blue[b][red_edges[r][1]] == 4) {
+//	                			System.out.println("asfadsf34");
+//	                		}                    	
                     	
                         if (blue[red_edges[r][0]][red_edges[r][1]] == 0) {
                             blue[red_edges[r][0]][red_edges[r][1]] = blue[b][red_edges[r][0]] + 1;
@@ -399,13 +402,13 @@ public class ShortestPathColors {
                             blue[red_edges[r][0]][red_edges[r][1]] =
                                     Math.max(blue[red_edges[r][0]][red_edges[r][1]], blue[b][red_edges[r][0]] + 1);
                         }
+                        
+                        if (blue[red_edges[r][0]][red_edges[r][1]] > 0) {
+                    			if (results[red_edges[r][1]] == 0) {
+                    				results[red_edges[r][1]] = blue[red_edges[r][0]][red_edges[r][1]]; 
+                    			}
+                        }                        
                     }
-                }
-                
-                if (blue[red_edges[r][0]][red_edges[r][1]] > 0) {
-                		if (results[red_edges[r][1]] == 0) {
-                			results[red_edges[r][1]] = blue[red_edges[r][0]][red_edges[r][1]]; 
-                		}
                 }
             }
         }
@@ -419,32 +422,6 @@ public class ShortestPathColors {
             if (results[to] == 0) {
             		results[to] = -1;
             }
-
-//            int result = -1;
-//
-//            for (int j = 0; j < red.length; ++j) {
-//                if (red[j][to] > 0) {
-//                    if (result == -1) {
-//                        result = red[j][to];
-//                    }
-//                    else {
-//                        result = Math.min(result, red[j][to]);
-//                    }
-//                }
-//            }
-//
-//            for (int j = 0; j < blue.length; ++j) {
-//                if (blue[j][to] > 0) {
-//                    if (result == -1) {
-//                        result = blue[j][to];
-//                    }
-//                    else {
-//                        result = Math.min(result, blue[j][to]);
-//                    }
-//                }
-//            }
-//
-//            results[to] = result;
         }
 
         return results;
