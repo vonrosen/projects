@@ -322,14 +322,16 @@ public class ShortestPathColors {
                         }
                         else {
                             red[red_edges[r][0]][red_edges[r][1]] = Math.max(red[rr][red_edges[r][0]] + 1, red[red_edges[r][0]][red_edges[r][1]]);
-                            //red[red_edges[r][0]][red_edges[r][1]] = red[rr][red_edges[r][0]] + 1;
                         }
                     }
                 }
+                
+                if (red[red_edges[r][0]][red_edges[r][1]] > 0) {
+                		if (results[red_edges[r][1]] == 0) {
+                			results[red_edges[r][1]] = red[red_edges[r][0]][red_edges[r][1]]; 
+                		}
+                }
             }
-
-            //System.out.println("s " + red[1][2]);
-
 
             for (int b = 0; b < blue_edges.length; ++b) {
                 for (int r = 0; r < red.length; ++r) {
@@ -340,10 +342,15 @@ public class ShortestPathColors {
                         else {
                             red[blue_edges[b][0]][blue_edges[b][1]] =
                                     Math.max(red[blue_edges[b][0]][blue_edges[b][1]], red[r][blue_edges[b][0]] + 1);
-//                            red[blue_edges[b][0]][blue_edges[b][1]] = red[r][blue_edges[b][0]] + 1;
                         }
                     }
                 }
+                
+                if (red[blue_edges[b][0]][blue_edges[b][1]] > 0) {
+            			if (results[blue_edges[b][1]] == 0) {
+            				results[blue_edges[b][1]] = red[blue_edges[b][0]][blue_edges[b][1]]; 
+            			}
+                }                
             }
 
             //blue first graph
@@ -352,72 +359,93 @@ public class ShortestPathColors {
                     blue[blue_edges[b][0]][blue_edges[b][1]] = 1;
                 }
 
-                for (int bb = 0; bb < red.length; ++bb) {
+                for (int bb = 0; bb < blue.length; ++bb) {
                     if (blue[bb][blue_edges[b][0]] > 0 && blue[bb][blue_edges[b][0]] % 2 == 0) {
                         if (blue[blue_edges[b][0]][blue_edges[b][1]] == 0) {
                             blue[blue_edges[b][0]][blue_edges[b][1]] = blue[bb][blue_edges[b][0]] + 1;
                         }
                         else {
-                            blue[blue_edges[b][0]][blue_edges[b][1]] = Math.max(blue[bb][blue_edges[b][0]] + 1, blue[blue_edges[b][0]][blue_edges[b][1]]);
-//                            blue[blue_edges[b][0]][blue_edges[b][1]] = blue[bb][blue_edges[b][0]] + 1;
+                            blue[blue_edges[b][0]][blue_edges[b][1]] = Math.max(blue[bb][blue_edges[b][0]] + 1, blue[blue_edges[b][0]][blue_edges[b][1]]);                            
                         }
                     }
                 }
+                
+                if (blue[blue_edges[b][0]][blue_edges[b][1]] > 0) {
+                		if (results[blue_edges[b][1]] == 0) {
+                			results[blue_edges[b][1]] = blue[blue_edges[b][0]][blue_edges[b][1]]; 
+                		}
+                }
             }
+            
+            int dd = 1;
 
             for (int r = 0; r < red_edges.length; ++r) {
+            	
+            		if (red_edges[r][0] == 4 && red_edges[r][1] == 2) {
+            			System.out.println("asfadsf");
+            		}
+            	
                 for (int b = 0; b < blue.length; ++b) {
                     if (blue[b][red_edges[r][0]] > 0 && blue[b][red_edges[r][0]] % 2 != 0) {
+                    	
+	                		if (blue[b][red_edges[r][0]] == 0 && blue[b][red_edges[r][1]] == 4) {
+	                			System.out.println("asfadsf34");
+	                		}                    	
+                    	
                         if (blue[red_edges[r][0]][red_edges[r][1]] == 0) {
                             blue[red_edges[r][0]][red_edges[r][1]] = blue[b][red_edges[r][0]] + 1;
                         }
                         else {
                             blue[red_edges[r][0]][red_edges[r][1]] =
                                     Math.max(blue[red_edges[r][0]][red_edges[r][1]], blue[b][red_edges[r][0]] + 1);
-//                            blue[red_edges[r][0]][red_edges[r][1]] = blue[b][red_edges[r][0]] + 1;
                         }
                     }
                 }
-            }
-
-            for (int to = 0; to < n; ++to) {
-                if (to == 0) {
-                    results[to] = 0;
-                    continue;
+                
+                if (blue[red_edges[r][0]][red_edges[r][1]] > 0) {
+                		if (results[red_edges[r][1]] == 0) {
+                			results[red_edges[r][1]] = blue[red_edges[r][0]][red_edges[r][1]]; 
+                		}
                 }
-
-                if (results[to] > 0) {
-                    continue;
-                }
-
-                int result = -1;
-
-                for (int j = 0; j < red.length; ++j) {
-                    if (red[j][to] > 0) {
-                        if (result == -1) {
-                            result = red[j][to];
-                        }
-                        else {
-                            result = Math.min(result, red[j][to]);
-                        }
-                    }
-                }
-
-                for (int j = 0; j < blue.length; ++j) {
-                    if (blue[j][to] > 0) {
-                        if (result == -1) {
-                            result = blue[j][to];
-                        }
-                        else {
-                            result = Math.min(result, blue[j][to]);
-                        }
-                    }
-                }
-
-                results[to] = result;
             }
         }
+        
+        for (int to = 0; to < n; ++to) {
+            if (to == 0) {
+                results[to] = 0;
+                continue;
+            }
 
+            if (results[to] == 0) {
+            		results[to] = -1;
+            }
+
+//            int result = -1;
+//
+//            for (int j = 0; j < red.length; ++j) {
+//                if (red[j][to] > 0) {
+//                    if (result == -1) {
+//                        result = red[j][to];
+//                    }
+//                    else {
+//                        result = Math.min(result, red[j][to]);
+//                    }
+//                }
+//            }
+//
+//            for (int j = 0; j < blue.length; ++j) {
+//                if (blue[j][to] > 0) {
+//                    if (result == -1) {
+//                        result = blue[j][to];
+//                    }
+//                    else {
+//                        result = Math.min(result, blue[j][to]);
+//                    }
+//                }
+//            }
+//
+//            results[to] = result;
+        }
 
         return results;
     }
