@@ -1,8 +1,5 @@
 package org.hunter.leetcode;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class ShortestPathColors {
 
     public void printArr(int[] arr) {
@@ -290,186 +287,8 @@ public class ShortestPathColors {
         s.printArr(s.shortestAlternatingPaths(n, red_edges, blue_edges));
     }
 
-    public int[] shortestAlternatingPaths2(int n, int[][] red_edges, int[][] blue_edges) {
-        Map<String, Integer> red = new HashMap<String, Integer>();
-        Map<String, Integer> blue = new HashMap<String, Integer>();
-        int [] results = new int[n];
-
-        if (red_edges.length == 0 && blue_edges.length == 0) {
-            for (int i = 0; i < n; ++i) {
-                if (i > 0) {
-                    results[i] = -1;
-                }
-            }
-        }
-
-        for (int i = 0; i < red_edges.length + blue_edges.length; ++i) {
-            // red first graph
-
-            Map<String, Integer> updates = new HashMap<String, Integer>();
-            for (int r  = 0; r < red_edges.length; ++r) {
-                Integer fromRed = red.get(red_edges[r][0] + "-" + red_edges[r][1] + "-red");
-
-                if (fromRed == null && red_edges[r][0] == 0) {
-                    red.put(red_edges[r][0] + "-" + red_edges[r][1] + "-red", 1);
-                    results[red_edges[r][1]] = 1;
-                }
-
-                for (String key : red.keySet()) {
-                    if (key.indexOf("blue") != -1) {
-                        Integer blueTo = Integer.valueOf(key.split("-")[1]);
-
-                        if (blueTo == red_edges[r][0]) {
-                            Integer blueCount = red.get(key);
-                            Integer toValue = red.get(red_edges[r][0] + "-" + red_edges[r][1] + "-red");
-
-                            if (toValue == null) {
-                                updates.put(red_edges[r][0] + "-" + red_edges[r][1] + "-red", blueCount + 1);
-                                if (results[red_edges[r][1]] == 0 || results[red_edges[r][1]] > blueCount + 1) {
-                                    results[red_edges[r][1]] = blueCount + 1;
-                                }
-                            }
-                            else {
-                                if (toValue > blueCount + 1) {
-                                    updates.put(red_edges[r][0] + "-" + red_edges[r][1] + "-red", blueCount + 1);
-                                    if (results[red_edges[r][1]] == 0 || results[red_edges[r][1]] > blueCount + 1) {
-                                        results[red_edges[r][1]] = blueCount + 1;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            red.putAll(updates);
-
-            updates = new HashMap<String, Integer>();
-
-            for (int b = 0; b < blue_edges.length; ++b) {
-                for (String key : red.keySet()) {
-                    if (key.indexOf("red") != -1) {
-                        Integer redTo = Integer.valueOf(key.split("-")[1]);
-
-                        if (redTo == blue_edges[b][0]) {
-                            Integer redCount = red.get(key);
-                            Integer toValue = red.get(blue_edges[b][0] + "-" + blue_edges[b][1] + "-blue");
-
-                            if (toValue == null) {
-                                updates.put(blue_edges[b][0] + "-" + blue_edges[b][1] + "-blue", redCount + 1);
-                                if (results[blue_edges[b][1]] == 0 || results[blue_edges[b][1]] > redCount + 1) {
-                                    results[blue_edges[b][1]] = redCount + 1;
-                                }
-                            }
-                            else {
-                                if (toValue > redCount + 1) {
-                                    updates.put(blue_edges[b][0] + "-" + blue_edges[b][1] + "-blue", redCount + 1);
-
-                                    if (results[blue_edges[b][1]] == 0 || results[blue_edges[b][1]] > redCount + 1) {
-                                        results[blue_edges[b][1]] = redCount + 1;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            red.putAll(updates);
-
-            // blue first graph
-            updates = new HashMap<String, Integer>();
-
-            for (int b  = 0; b < blue_edges.length; ++b) {
-                Integer fromBlue = blue.get(blue_edges[b][0] + "-" + blue_edges[b][1] + "-blue");
-
-                if (fromBlue == null && blue_edges[b][0] == 0) {
-                    blue.put(blue_edges[b][0] + "-" + blue_edges[b][1] + "-blue", 1);
-                    results[blue_edges[b][1]] = 1;
-                }
-
-                for (String key : blue.keySet()) {
-                    if (key.indexOf("red") != -1) {
-                        Integer redTo = Integer.valueOf(key.split("-")[1]);
-
-                        if (redTo == blue_edges[b][0]) {
-                            Integer redCount = blue.get(key);
-                            Integer toValue = blue.get(blue_edges[b][0] + "-" + blue_edges[b][1] + "-blue");
-
-                            if (toValue == null) {
-                                updates.put(blue_edges[b][0] + "-" + blue_edges[b][1] + "-blue", redCount + 1);
-
-                                if (results[blue_edges[b][1]] == 0 || results[blue_edges[b][1]] > redCount + 1) {
-                                    results[blue_edges[b][1]] = redCount + 1;
-                                }
-                            }
-                            else {
-                                if (toValue > redCount + 1) {
-                                    updates.put(blue_edges[b][0] + "-" + blue_edges[b][1] + "-blue", redCount + 1);
-
-                                    if (results[blue_edges[b][1]] == 0 | results[blue_edges[b][1]] > redCount + 1) {
-                                        results[blue_edges[b][1]] = redCount + 1;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            blue.putAll(updates);
-            updates = new HashMap<String, Integer>();
-
-            for (int r = 0; r < red_edges.length; ++r) {
-                for (String key : blue.keySet()) {
-                    if (key.indexOf("blue") != -1) {
-                        Integer blueTo = Integer.valueOf(key.split("-")[1]);
-
-                        if (blueTo == red_edges[r][0]) {
-                            Integer blueCount = blue.get(key);
-                            Integer toValue = blue.get(red_edges[r][0] + "-" + red_edges[r][1] + "-red");
-
-                            if (toValue == null) {
-                                updates.put(red_edges[r][0] + "-" + red_edges[r][1] + "-red", blueCount + 1);
-
-                                if (results[red_edges[r][1]] == 0 || results[red_edges[r][1]] > blueCount + 1) {
-                                    results[red_edges[r][1]] = blueCount + 1;
-                                }
-                            }
-                            else {
-                                if (toValue > blueCount + 1) {
-                                    updates.put(red_edges[r][0] + "-" + red_edges[r][1] + "-red", blueCount + 1);
-
-                                    if (results[red_edges[r][1]] == 0 || results[red_edges[r][1]] > blueCount + 1) {
-                                        results[red_edges[r][1]] = blueCount + 1;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            blue.putAll(updates);
-        }
-
-        for (int to = 0; to < n; ++to) {
-            if (to == 0) {
-                results[to] = 0;
-                continue;
-            }
-
-            if (results[to] == 0) {
-                results[to] = -1;
-            }
-        }
-
-        return results;
-    }
-
     public int[] shortestAlternatingPaths(int n, int[][] red_edges, int[][] blue_edges) {
-        int[][][] red = new int[100][100][2];
-        int[][][] blue = new int[100][100][2];
+        int[][][] graph = new int[100][100][2];
         int[] results = new int[n];
 
         if (red_edges.length == 0 && blue_edges.length == 0) {
@@ -480,100 +299,71 @@ public class ShortestPathColors {
             }
         }
 
-        //System.out.println("length is " + (red_edges.length + blue_edges.length));
+        int maxEdgeLength = Math.max(red_edges.length, blue_edges.length);
 
-        for (int i = 0; i < red_edges.length + blue_edges.length; ++i) {
-            // red first graph
-            for (int r = 0; r < red_edges.length; ++r) {
-                if (red[red_edges[r][0]][red_edges[r][1]][0] == 0 && red_edges[r][0] == 0) {
-                    red[red_edges[r][0]][red_edges[r][1]][0] = 1;
-                    results[red_edges[r][1]] = 1;
+        for (int count = 0; count < red_edges.length + blue_edges.length; ++count) {
+            for (int i = 0; i < maxEdgeLength; ++i) {
+                int [] red_edge = null;
+                int [] blue_edge = null;
+                if (i < red_edges.length) {
+                    red_edge = red_edges[i];
                 }
 
-                for (int rr = 0; rr < red.length; ++rr) {
-                    if (red[rr][red_edges[r][0]][1] > 0) {
-                        if (red[red_edges[r][0]][red_edges[r][1]][0] == 0) {
-                            red[red_edges[r][0]][red_edges[r][1]][0]= red[rr][red_edges[r][0]][1] + 1;
-                            if (results[red_edges[r][1]] == 0 || results[red_edges[r][1]] > red[red_edges[r][0]][red_edges[r][1]][0]) {
-                                results[red_edges[r][1]] = red[red_edges[r][0]][red_edges[r][1]][0];
+                if (i < blue_edges.length) {
+                    blue_edge = blue_edges[i];
+                }
+
+                if (red_edge != null) {
+                    if (graph[red_edge[0]][red_edge[1]][0] == 0 && red_edge[0] == 0) {
+                        graph[red_edge[0]][red_edge[1]][0] = 1;
+                        results[red_edge[1]] = 1;
+                    }
+                }
+
+                if (blue_edge != null) {
+                    if (graph[blue_edge[0]][blue_edge[1]][1] == 0 && blue_edge[0] == 0) {
+                        graph[blue_edge[0]][blue_edge[1]][1] = 1;
+                        results[blue_edge[1]] = 1;
+                    }
+                }
+
+                for (int g = 0; g < graph.length; ++g) {
+                    if (red_edge != null) {
+                        if (graph[g][red_edge[0]][1] > 0) { //link from a blue edge
+                            if (graph[red_edge[0]][red_edge[1]][0] == 0) {
+                                graph[red_edge[0]][red_edge[1]][0] = graph[g][red_edge[0]][1] + 1;
+                                if (results[red_edge[1]] == 0 || results[red_edge[1]] > graph[red_edge[0]][red_edge[1]][0]) {
+                                    results[red_edge[1]] = graph[red_edge[0]][red_edge[1]][0];
+                                }
                             }
-                        }
-                        else {
-                            if (red[red_edges[r][0]][red_edges[r][1]][0] > red[rr][red_edges[r][0]][1] + 1) {
-                                red[red_edges[r][0]][red_edges[r][1]][0]= red[rr][red_edges[r][0]][1] + 1;
-                                if (results[red_edges[r][1]] == 0 || results[red_edges[r][1]] > red[red_edges[r][0]][red_edges[r][1]][0]) {
-                                    results[red_edges[r][1]] = red[red_edges[r][0]][red_edges[r][1]][0];
+                            else {
+                                if (graph[red_edge[0]][red_edge[1]][0] > graph[g][red_edge[0]][1] + 1) {
+                                    graph[red_edge[0]][red_edge[1]][0]= graph[g][red_edge[0]][1] + 1;
+                                    if (results[red_edge[1]] == 0 || results[red_edge[1]] > graph[red_edge[0]][red_edge[1]][0]) {
+                                        results[red_edge[1]] = graph[red_edge[0]][red_edge[1]][0];
+                                    }
                                 }
                             }
                         }
                     }
-                }
-            }
 
-            for (int b = 0; b < blue_edges.length; ++b) {
-                for (int r = 0; r < red.length; ++r) {
-                    if (red[r][blue_edges[b][0]][0] > 0) {
-                        if (red[blue_edges[b][0]][blue_edges[b][1]][1] == 0) {
-                            red[blue_edges[b][0]][blue_edges[b][1]][1] = red[r][blue_edges[b][0]][0] + 1;
-                            if (results[blue_edges[b][1]] == 0 || results[blue_edges[b][1]] > red[blue_edges[b][0]][blue_edges[b][1]][1]) {
-                                results[blue_edges[b][1]] = red[blue_edges[b][0]][blue_edges[b][1]][1];
+                    if (blue_edge != null) {
+                        if (graph[g][blue_edge[0]][0] > 0) { //link from red edge
+                            if (graph[blue_edge[0]][blue_edge[1]][1] == 0) {
+                                graph[blue_edge[0]][blue_edge[1]][1]= graph[g][blue_edge[0]][0] + 1;
+                                if (results[blue_edge[1]] == 0 || results[blue_edge[1]] > graph[blue_edge[0]][blue_edge[1]][1]) {
+                                    results[blue_edge[1]] = graph[blue_edge[0]][blue_edge[1]][1];
+                                }
                             }
-                        }
-                        else {
-                            if (red[blue_edges[b][0]][blue_edges[b][1]][1] > red[r][blue_edges[b][0]][0] + 1) {
-                                red[blue_edges[b][0]][blue_edges[b][1]][1] = red[r][blue_edges[b][0]][0] + 1;
-                                if (results[blue_edges[b][1]] == 0 || results[blue_edges[b][1]] > red[blue_edges[b][0]][blue_edges[b][1]][1]) {
-                                    results[blue_edges[b][1]] = red[blue_edges[b][0]][blue_edges[b][1]][1];
+                            else {
+                                if (graph[blue_edge[0]][blue_edge[1]][1] > graph[g][blue_edge[0]][0] + 1) {
+                                    graph[blue_edge[0]][blue_edge[1]][1]= graph[g][blue_edge[0]][0] + 1;
+                                    if (results[blue_edge[1]] == 0 || results[blue_edge[1]] > graph[blue_edge[0]][blue_edge[1]][1]) {
+                                        results[blue_edge[1]] = graph[blue_edge[0]][blue_edge[1]][1];
+                                    }
                                 }
                             }
                         }
-                    }
-                }
-            }
-
-            // blue first graph
-            for (int b = 0; b < blue_edges.length; ++b) {
-                if (blue[blue_edges[b][0]][blue_edges[b][1]][1] == 0 && blue_edges[b][0] == 0) {
-                    blue[blue_edges[b][0]][blue_edges[b][1]][1] = 1;
-                    results[blue_edges[b][1]] = 1;
-                }
-
-                for (int bb = 0; bb < blue.length; ++bb) {
-                    if (blue[bb][blue_edges[b][0]][0] > 0) {
-                        if (blue[blue_edges[b][0]][blue_edges[b][1]][1] == 0) {
-                            blue[blue_edges[b][0]][blue_edges[b][1]][1] = blue[bb][blue_edges[b][0]][0] + 1;
-                            if (results[blue_edges[b][1]] == 0 || results[blue_edges[b][1]] > blue[blue_edges[b][0]][blue_edges[b][1]][1]) {
-                                results[blue_edges[b][1]] = blue[blue_edges[b][0]][blue_edges[b][1]][1];
-                            }
-                        }
-                        else {
-                            if (blue[blue_edges[b][0]][blue_edges[b][1]][1] > blue[bb][blue_edges[b][0]][0] + 1) {
-                                blue[blue_edges[b][0]][blue_edges[b][1]][1] = blue[bb][blue_edges[b][0]][0] + 1;
-                                if (results[blue_edges[b][1]] == 0 || results[blue_edges[b][1]] > blue[blue_edges[b][0]][blue_edges[b][1]][1]) {
-                                    results[blue_edges[b][1]] = blue[blue_edges[b][0]][blue_edges[b][1]][1];
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            for (int r = 0; r < red_edges.length; ++r) {
-                for (int b = 0; b < blue.length; ++b) {
-					if (blue[b][red_edges[r][0]][1] > 0) {
-					    if (blue[red_edges[r][0]][red_edges[r][1]][0] == 0) {
-					        blue[red_edges[r][0]][red_edges[r][1]][0] = blue[b][red_edges[r][0]][1] + 1;
-					        if (results[red_edges[r][1]] == 0 || results[red_edges[r][1]] > blue[red_edges[r][0]][red_edges[r][1]][0]) {
-					            results[red_edges[r][1]] = blue[red_edges[r][0]][red_edges[r][1]][0];
-					        }
-					    }
-					    else {
-					        if (blue[red_edges[r][0]][red_edges[r][1]][0] > blue[b][red_edges[r][0]][1] + 1) {
-	                            if (results[red_edges[r][1]] == 0 || results[red_edges[r][1]] > blue[red_edges[r][0]][red_edges[r][1]][0]) {
-	                                results[red_edges[r][1]] = blue[red_edges[r][0]][red_edges[r][1]][0];
-	                            }
-					        }
-					    }
                     }
                 }
             }
