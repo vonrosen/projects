@@ -92,6 +92,57 @@ public class BFSSolutionCopy {
         }
     }
 
+    public int[] shortestAlternatingPaths2(int n, int[][] red_edges, int[][] blue_edges) {
+        Map<Integer, List<Integer>> redMap = new HashMap<>();
+        Map<Integer, List<Integer>> blueMap = new HashMap<>();
+        // build graph for red edges and blue edges
+        for (int[] re : red_edges) {
+            int v = re[0], u = re[1];
+            redMap.putIfAbsent(v, new ArrayList<>());
+            redMap.get(v).add(u);
+        }
+        for (int[] be : blue_edges) {
+            int v = be[0], u = be[1];
+            blueMap.putIfAbsent(v, new ArrayList<>());
+            blueMap.get(v).add(u);
+        }
+
+        // int[] {curIdx, color}
+        // color 0 denoting next edge should be red
+        // color 1 denoting next edge should be blue
+        Queue<int[]> queue = new LinkedList<>();
+        queue.offer(new int[] { 0, 0 });
+        queue.offer(new int[] { 0, 1 });
+        boolean[][] visited = new boolean[2][n];
+        int[] res = new int[n];
+        Arrays.fill(res, -1);
+        int step = 0;
+        while (!queue.isEmpty()) {
+            int size = queue.size();
+            while (size-- > 0) {
+                int[] cur = queue.poll();
+                int v = cur[0], c = cur[1];
+                if (visited[c][v])
+                    continue;
+                visited[c][v] = true;
+
+                // only update res as the shorted path length
+                if (res[v] == -1)
+                    res[v] = step;
+                Map<Integer, List<Integer>> map = (c == 0 ? redMap : blueMap);
+                if (!map.containsKey(v))
+                    continue;
+                for (int next : map.get(v)) {
+                    // switch the next color and put the next state to queue
+                    queue.offer(new int[] { next, c ^ 1 });
+                }
+            }
+            step++;
+        }
+
+        return res;
+    }
+
     public int[] shortestAlternatingPaths(int n, int[][] red_edges, int[][] blue_edges) {
         int[] result = new int[n];
         Arrays.fill(result, -1);
