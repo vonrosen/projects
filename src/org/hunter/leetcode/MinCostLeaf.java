@@ -7,7 +7,10 @@ import java.util.List;
 public class MinCostLeaf {
 
 	public static void main(String [] args) {
-		int [] arr = new int [] { 6,2,4 };
+		//int [] arr = new int [] { 6,2,4 };
+		int [] arr = new int [] {15,13,5,3,15};
+		//510
+		//exp = 500
 		
 		MinCostLeaf mcl = new MinCostLeaf();		
 		System.out.println(mcl.mctFromLeafValues(arr));
@@ -44,6 +47,7 @@ public class MinCostLeaf {
 			}
 		}
 		else {
+			int finalValue = 0;
 			int even = arr.length - 1;
 			int tmpEven = even;
 			int outerStart = 0;
@@ -58,7 +62,7 @@ public class MinCostLeaf {
 					for (; tmpEnd < tmpArr.length; tmpEnd += skip) {
 						int mid = (start + tmpEnd) / 2;
 						if (start == mid) {
-							l.add(arr[start] * arr[tmpEnd]);
+							l.add(tmpArr[start] * tmpArr[tmpEnd]);
 						}
 						else {
 							int limit = mid - start;
@@ -80,14 +84,21 @@ public class MinCostLeaf {
 					remaining = arr[0];
 				}
 				
-				
-				
-				l.stream().mapToInt(Integer::intValue).sum();				
+				int sum = l.stream().mapToInt(Integer::intValue).sum();				
 				l.clear();
+				
+				if (finalValue == 0) {
+					finalValue = sum + (remaining * Arrays.stream(tmpArr).max().getAsInt());
+				}
+				else {
+					finalValue = Math.min(finalValue, sum + (remaining * Arrays.stream(tmpArr).max().getAsInt()));
+				}
 				
 				tmpEven++;
 				outerStart++;
 			}
+			
+			return finalValue;
 		}
 
 		return l.stream().mapToInt(Integer::intValue).sum();
