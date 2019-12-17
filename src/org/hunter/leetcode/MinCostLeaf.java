@@ -83,8 +83,15 @@ public class MinCostLeaf {
 						n.parents.add(parent);
 						l.add(parent);
 						
+//						if (parent.value == 582) {
+//							System.out.println("good!");
+//						}
+						
 						if (n.indexLeft - 2 >= 0) {
 							parent = new Node((arr[n.indexLeft - 1] * arr[n.indexLeft - 2]) + (Math.max(arr[n.indexLeft - 1], arr[n.indexLeft - 2]) * n.maxValue) + n.value);
+//							if (parent.value == 582) {
+//								System.out.println("good!");
+//							}
 							parent.indexLeft = n.indexLeft - 2;
 							parent.indexRight = n.indexRight;
 							parent.maxValue = Math.max(Math.max(n.maxValue, arr[n.indexLeft - 1]), arr[n.indexLeft - 2]);
@@ -96,6 +103,9 @@ public class MinCostLeaf {
 					//then right
 					if (n.indexRight + 1 < arr.length) {
 						Node parent = new Node((arr[n.indexRight + 1] * n.maxValue) + n.value);
+//						if (parent.value == 582) {
+//							System.out.println("good!");
+//						}
 						parent.indexLeft = n.indexLeft;
 						parent.indexRight = n.indexRight + 1;
 						parent.maxValue = Math.max(n.maxValue, arr[n.indexRight + 1]);
@@ -103,7 +113,10 @@ public class MinCostLeaf {
 						l.add(parent);
 						
 						if (n.indexRight + 2 < arr.length) {							
-							parent = new Node((arr[n.indexRight + 1] * arr[n.indexRight + 2]) + (Math.max(arr[n.indexRight + 1], arr[n.indexRight + 2]) * n.maxValue) + n.value);							
+							parent = new Node((arr[n.indexRight + 1] * arr[n.indexRight + 2]) + (Math.max(arr[n.indexRight + 1], arr[n.indexRight + 2]) * n.maxValue) + n.value);
+//							if (parent.value == 582) {
+//								System.out.println("good!");
+//							}
 							parent.indexLeft = n.indexLeft;
 							parent.indexRight = n.indexRight + 2;
 							parent.maxValue = Math.max(Math.max(n.maxValue, arr[n.indexRight + 1]), arr[n.indexRight + 2]);
@@ -114,15 +127,22 @@ public class MinCostLeaf {
 				}
 			}
 			
-			for (int i = 0; i < l.size(); ++i) {
-				Node n = l.get(i);
-				if (n.value == 566) {
-					System.out.println("DONE");
-				}
-			}
+//			for (int i = 0; i < l.size(); ++i) {
+//				Node n = l.get(i);
+//				if (n.value == 566) {
+//					System.out.println("DONE");
+//				}
+//			}
 			
 			
-			if (l.size() == size) {
+			if (l.size() == size) {				
+				for (int i = 0; i < l.size(); ++i) {
+					Node n = l.get(i);
+					if (n.value == 611 && n.parents.size() == 0) {
+						System.out.println("DONE");
+					}
+				}				
+				
 				result = l.stream().filter(i -> i.parents.size() == 0).reduce((first, next) -> first.value < next.value ? first : next).get().value;
 				break;
 			}
