@@ -1,8 +1,9 @@
 package org.hunter.leetcode;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MinCostLeaf {
 
@@ -31,14 +32,51 @@ public class MinCostLeaf {
 		//510
 		//exp = 500
 		
-		int [] arr = new int [] {3,7,2,12,15,10,3,9};
+		//int [] arr = new int [] {3,7,2,12,15,10,3,9};
+		int [] arr = new int [] {3,7,2,12};
+		//int [] arr = new int [] {15,10,3,9};
+		//int [] arr = new int [] {6,2,8,3};
+		//int [] arr = new int [] {6,2,4,1,7};
+
 		//exp = 566
 		
 		MinCostLeaf mcl = new MinCostLeaf();		
 		System.out.println(mcl.mctFromLeafValues(arr));
 	}
 
-	public int mctFromLeafValues(int[] arr) {
+//	public int mctFromLeafValues(int[] arr) {
+//		if (arr.length == 0 || arr.length == 1) {
+//			return 0;
+//		}
+//
+//		if (arr.length == 2) {
+//			return arr[0] * arr[1];
+//		}
+//		
+//		int result = 0;
+//		
+//		Map<Integer, List<Node>> m = new HashMap<Integer, List<Node>>();
+//		
+//		int skip = 1;
+//		while (skip <= arr.length) {
+//			int start = 0;
+//			int end = start + skip;
+//
+//			for (; end < arr.length; end += skip) {
+//				Node n = new Node(arr[start] * arr[end]);
+//				n.indexLeft = start;
+//				n.indexRight = end;
+//				n.maxValue = Math.max(arr[start], arr[end]);			
+//				m.putIfAbsent(skip + 1, new ArrayList<Node>());
+//				m.get(skip + 1).add(n);						
+//				start += skip;			
+//			}
+//			++skip;
+//		}
+//		
+//	}
+	
+	public int mctFromLeafValues3(int[] arr) {
 		if (arr.length == 0 || arr.length == 1) {
 			return 0;
 		}
