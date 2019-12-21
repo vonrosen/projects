@@ -1,6 +1,7 @@
 package org.hunter.leetcode;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,12 +9,9 @@ import java.util.Map;
 public class MinCostLeaf {
 
 	class Node {
-		Node left;
-		Node right;
-		List<Node> parents = new ArrayList<Node>();
 		int indexLeft = -1;
 		int indexRight = -1;
-		int maxValue = -1;
+		int maxLeafValue = -1;
 		
 		Node(int value) {
 			this.value = value;
@@ -22,7 +20,7 @@ public class MinCostLeaf {
 		int value;
 		
 		public String toString() {
-			return "value = " + this.value + " left = " + this.left + " right = " + this.right + " indexLeft = " + this.indexLeft + " indexRight = " + this.indexRight;
+			return "value = " + this.value + " indexLeft = " + this.indexLeft + " indexRight = " + this.indexRight + " maxLeafValue = " + this.maxLeafValue;
 		}
 	}
 	
@@ -32,8 +30,8 @@ public class MinCostLeaf {
 		//510
 		//exp = 500
 		
-		//int [] arr = new int [] {3,7,2,12,15,10,3,9};
-		int [] arr = new int [] {3,7,2,12};
+		int [] arr = new int [] {3,7,2,12,15,10,3,9};
+		//int [] arr = new int [] {3,7,2,12};
 		//int [] arr = new int [] {15,10,3,9};
 		//int [] arr = new int [] {6,2,8,3};
 		//int [] arr = new int [] {6,2,4,1,7};
@@ -44,39 +42,7 @@ public class MinCostLeaf {
 		System.out.println(mcl.mctFromLeafValues(arr));
 	}
 
-//	public int mctFromLeafValues(int[] arr) {
-//		if (arr.length == 0 || arr.length == 1) {
-//			return 0;
-//		}
-//
-//		if (arr.length == 2) {
-//			return arr[0] * arr[1];
-//		}
-//		
-//		int result = 0;
-//		
-//		Map<Integer, List<Node>> m = new HashMap<Integer, List<Node>>();
-//		
-//		int skip = 1;
-//		while (skip <= arr.length) {
-//			int start = 0;
-//			int end = start + skip;
-//
-//			for (; end < arr.length; end += skip) {
-//				Node n = new Node(arr[start] * arr[end]);
-//				n.indexLeft = start;
-//				n.indexRight = end;
-//				n.maxValue = Math.max(arr[start], arr[end]);			
-//				m.putIfAbsent(skip + 1, new ArrayList<Node>());
-//				m.get(skip + 1).add(n);						
-//				start += skip;			
-//			}
-//			++skip;
-//		}
-//		
-//	}
-	
-	public int mctFromLeafValues3(int[] arr) {
+	public int mctFromLeafValues(int[] arr) {
 		if (arr.length == 0 || arr.length == 1) {
 			return 0;
 		}
@@ -85,107 +51,107 @@ public class MinCostLeaf {
 			return arr[0] * arr[1];
 		}
 		
-		int result = 0;
+		Map<Integer, List<Node>> m = new HashMap<Integer, List<Node>>();
 		
-		List<Node> l = new ArrayList<Node>();
-		
-		int start = 0;
-		int end = 1;
 		int skip = 1;
+		while (skip < arr.length) {
+			int start = 0;
+			int end = start + skip;
 
-		for (; end < arr.length; end += skip) {
-			Node n = new Node(arr[start] * arr[end]);
-			n.indexLeft = start;
-			n.indexRight = end;
-			n.maxValue = Math.max(arr[start], arr[end]);
-			Node left = new Node(arr[start]);
-			Node right = new Node(arr[end]);
-			left.parents.add(n);
-			right.parents.add(n);
-			
-			l.add(n);						
-			start += skip;			
-		}		
+			for (; end < arr.length; end += skip) {
+				if (skip == 1) {
+					Node n = new Node(arr[start] * arr[end]);
+					n.indexLeft = start;
+					n.indexRight = end;
+					n.maxLeafValue = Math.max(arr[start], arr[end]);		
 
-		while (l.size() > 0) {
-			int size = l.size();
-			for (int i = 0; i < size; ++i) {
-				Node n = l.get(i);			
-				if (n.parents.size() == 0) {
-					//left
-					if (n.indexLeft - 1 >= 0) {
-						Node parent = new Node((arr[n.indexLeft - 1] * n.maxValue) + n.value);
-						parent.indexLeft = n.indexLeft - 1;
-						parent.indexRight = n.indexRight;
-						parent.maxValue = Math.max(n.maxValue, arr[n.indexLeft - 1]);
-						n.parents.add(parent);
-						l.add(parent);
-						
-//						if (parent.value == 582) {
-//							System.out.println("good!");
-//						}
-						
-						if (n.indexLeft - 2 >= 0) {
-							parent = new Node((arr[n.indexLeft - 1] * arr[n.indexLeft - 2]) + (Math.max(arr[n.indexLeft - 1], arr[n.indexLeft - 2]) * n.maxValue) + n.value);
-//							if (parent.value == 582) {
-//								System.out.println("good!");
-//							}
-							parent.indexLeft = n.indexLeft - 2;
-							parent.indexRight = n.indexRight;
-							parent.maxValue = Math.max(Math.max(n.maxValue, arr[n.indexLeft - 1]), arr[n.indexLeft - 2]);
-							n.parents.add(parent);
-							l.add(parent);						
-						}
-					}
-					
-					//then right
-					if (n.indexRight + 1 < arr.length) {
-						Node parent = new Node((arr[n.indexRight + 1] * n.maxValue) + n.value);
-//						if (parent.value == 582) {
-//							System.out.println("good!");
-//						}
-						parent.indexLeft = n.indexLeft;
-						parent.indexRight = n.indexRight + 1;
-						parent.maxValue = Math.max(n.maxValue, arr[n.indexRight + 1]);
-						n.parents.add(parent);
-						l.add(parent);
-						
-						if (n.indexRight + 2 < arr.length) {							
-							parent = new Node((arr[n.indexRight + 1] * arr[n.indexRight + 2]) + (Math.max(arr[n.indexRight + 1], arr[n.indexRight + 2]) * n.maxValue) + n.value);
-//							if (parent.value == 582) {
-//								System.out.println("good!");
-//							}
-							parent.indexLeft = n.indexLeft;
-							parent.indexRight = n.indexRight + 2;
-							parent.maxValue = Math.max(Math.max(n.maxValue, arr[n.indexRight + 1]), arr[n.indexRight + 2]);
-							n.parents.add(parent);
-							l.add(parent);						
-						}
-					}				
+					m.putIfAbsent(skip, new ArrayList<Node>());
+					m.get(skip).add(n);					
 				}
-			}
-			
-//			for (int i = 0; i < l.size(); ++i) {
-//				Node n = l.get(i);
-//				if (n.value == 566) {
-//					System.out.println("DONE");
-//				}
-//			}
-			
-			
-			if (l.size() == size) {				
-				for (int i = 0; i < l.size(); ++i) {
-					Node n = l.get(i);
-					if (n.value == 611 && n.parents.size() == 0) {
-						System.out.println("DONE");
-					}
-				}				
+				else {
+					Node n = new Node(0);
+					int mid = skip / 2;
+					for (int i = skip - 1; i >= mid; --i) {
+						for (Node node : m.get(i)) {
+							if (node.indexLeft >= start && node.indexRight <= end) {
+								if (node.indexLeft == start) {
+									int remain = end - node.indexRight - 1;
+									if (remain == 0) {
+										//only 1 element remaining
+										int product = node.maxLeafValue * arr[end] + node.value;										
+										n.value = product < n.value || n.value == 0 ? product : n.value;										
+									}
+									else {
+										for (Node nn : m.get(remain)) {
+											if (nn.indexLeft == node.indexRight + 1 && nn.indexRight == end) {
+												int product = (node.maxLeafValue * nn.maxLeafValue) + node.value + nn.value; 										
+												n.value = product < n.value || n.value == 0 ? product : n.value;																						
+											}
+										}
+									}
+								}
+								
+								if (node.indexRight == end) {
+									int remain = node.indexLeft - start - 1;
+									if (remain == 0) {
+										//only 1 element remaining
+										int product = node.maxLeafValue * arr[start] + node.value;										
+										n.value = product < n.value || n.value == 0 ? product : n.value;										
+									}
+									else {
+										for (Node nn : m.get(remain)) {
+											if (nn.indexLeft == start && nn.indexRight == node.indexLeft - 1) {
+												int product = (node.maxLeafValue * nn.maxLeafValue) + node.value + nn.value; 										
+												n.value = product < n.value || n.value == 0 ? product : n.value;																						
+											}
+										}
+									}									
+								}
+								
+								if (node.indexLeft > start && node.indexRight < end) {
+									int startLeft = start;
+									int endLeft = node.indexLeft - 1;
+									int startRight = node.indexRight + 1;
+									int endRight = end;
+
+									if (endLeft - startLeft == 1) {
+										int product = (node.maxLeafValue * arr[startLeft]) + node.value; 										
+										n.value = product < n.value || n.value == 0 ? product : n.value;										
+									}
+									else {
+										for (Node nn : m.get(endLeft - startLeft)) {
+											if (nn.indexLeft == start && nn.indexRight == endLeft) {
+												int product = (node.maxLeafValue * nn.maxLeafValue) + node.value + nn.value; 										
+												n.value = product < n.value || n.value == 0 ? product : n.value;											
+											}
+										}										
+									}
+									
+									if (endRight - startRight == 1) {
+										
+									}
+									else {
+										for (Node nn : m.get(endRight - startRight)) {
+											if (nn.indexLeft == startRight && nn.indexRight == endRight) {
+												int product = (node.maxLeafValue * nn.maxLeafValue) + node.value + nn.value; 										
+												n.value = product < n.value || n.value == 0 ? product : n.value;																						
+											}										
+										}										
+									}
+								}
+							}
+						}
+					}	
+					
+					m.putIfAbsent(skip, new ArrayList<Node>());
+					m.get(skip).add(n);					
+				}
 				
-				result = l.stream().filter(i -> i.parents.size() == 0).reduce((first, next) -> first.value < next.value ? first : next).get().value;
-				break;
+				start += skip;			
 			}
+			++skip;
 		}
 		
-		return result;
+		return m.get(skip - 1).stream().reduce((first, next) -> first.value < next.value ? first : next).get().value;		
 	}
 }
