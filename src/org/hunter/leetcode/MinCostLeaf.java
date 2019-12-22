@@ -1,7 +1,6 @@
 package org.hunter.leetcode;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,12 +30,12 @@ public class MinCostLeaf {
 		//exp = 500
 		
 		int [] arr = new int [] {3,7,2,12,15,10,3,9};
+		//exp = 566		
 		//int [] arr = new int [] {3,7,2,12};
 		//int [] arr = new int [] {15,10,3,9};
 		//int [] arr = new int [] {6,2,8,3};
 		//int [] arr = new int [] {6,2,4,1,7};
 
-		//exp = 566
 		
 		MinCostLeaf mcl = new MinCostLeaf();		
 		System.out.println(mcl.mctFromLeafValues(arr));
@@ -55,10 +54,8 @@ public class MinCostLeaf {
 		
 		int skip = 1;
 		while (skip < arr.length) {
-			int start = 0;
-			int end = start + skip;
-
-			for (; end < arr.length; end += skip) {
+			int end = skip;
+			for (int start = 0; end < arr.length; start++, end++) {
 				if (skip == 1) {
 					Node n = new Node(arr[start] * arr[end]);
 					n.indexLeft = start;
@@ -70,6 +67,13 @@ public class MinCostLeaf {
 				}
 				else {
 					Node n = new Node(0);
+					n.indexLeft = start;
+					n.indexRight = end;
+					
+					for (int ii = start; ii <= end; ++ii) {
+						n.maxLeafValue = n.maxLeafValue < arr[ii] || n.maxLeafValue == 0 ? arr[ii] : n.maxLeafValue;
+					}
+					
 					int mid = skip / 2;
 					for (int i = skip - 1; i >= mid; --i) {
 						for (Node node : m.get(i)) {
@@ -113,27 +117,32 @@ public class MinCostLeaf {
 									int endLeft = node.indexLeft - 1;
 									int startRight = node.indexRight + 1;
 									int endRight = end;
+									int nodeValue = 0;
+									int maxLeafValue = 0;
 
-									if (endLeft - startLeft == 1) {
+									if (startLeft == endLeft) {
 										int product = (node.maxLeafValue * arr[startLeft]) + node.value; 										
-										n.value = product < n.value || n.value == 0 ? product : n.value;										
+										nodeValue = product < n.value || n.value == 0 ? product : n.value;
+										maxLeafValue = Math.max(n.maxLeafValue, arr[startLeft]);
 									}
 									else {
 										for (Node nn : m.get(endLeft - startLeft)) {
 											if (nn.indexLeft == start && nn.indexRight == endLeft) {
 												int product = (node.maxLeafValue * nn.maxLeafValue) + node.value + nn.value; 										
-												n.value = product < n.value || n.value == 0 ? product : n.value;											
+												nodeValue = product < n.value || n.value == 0 ? product : n.value;
+												maxLeafValue = Math.max(nn.maxLeafValue, n.maxLeafValue);
 											}
 										}										
 									}
 									
-									if (endRight - startRight == 1) {
-										
+									if (startRight == endRight) {
+										int product = (maxLeafValue * arr[endRight]) + nodeValue; 										
+										n.value = product < n.value || n.value == 0 ? product : n.value;																				
 									}
 									else {
 										for (Node nn : m.get(endRight - startRight)) {
 											if (nn.indexLeft == startRight && nn.indexRight == endRight) {
-												int product = (node.maxLeafValue * nn.maxLeafValue) + node.value + nn.value; 										
+												int product = (maxLeafValue * nn.maxLeafValue) + nodeValue + nn.value; 										
 												n.value = product < n.value || n.value == 0 ? product : n.value;																						
 											}										
 										}										
@@ -145,9 +154,7 @@ public class MinCostLeaf {
 					
 					m.putIfAbsent(skip, new ArrayList<Node>());
 					m.get(skip).add(n);					
-				}
-				
-				start += skip;			
+				}			
 			}
 			++skip;
 		}
