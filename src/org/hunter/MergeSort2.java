@@ -12,10 +12,14 @@ public class MergeSort2 {
 				8				
 		};		
 		MergeSort2 m = new MergeSort2();		
-		int [] sorted = m.sort(arr, 0, arr.length - 1);		
+		int [] sorted = m.sort(arr);		
 		for (int i = 0; i < sorted.length; ++i) {
 			System.out.println(sorted[i]);
 		}
+	}
+	
+	public int [] sort(int [] arr) {
+		return sort(arr, 0, arr.length - 1);
 	}
 	
 	public int [] sort(int [] arr, int start, int end) {
