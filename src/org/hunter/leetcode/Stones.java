@@ -6,50 +6,45 @@ public class Stones {
 
 	public static void main(String[] args) {
 		int[] piles = { 5, 3, 4, 5 };
+//		int[] piles = { 3, 4, 5 };
+//		int[] piles = { 4, 5 };
 
 		Stones s = new Stones();
 		System.out.println(s.stoneGame(piles));
 	}
 
 	public boolean stoneGame(int[] piles) {
-		int [] mem = new int[250 * 500];
-		int [][] mem2 = new int[250 * 500][2];
-		int turns = 0;
+		if (piles.length == 2) {
+			return Math.max(piles[0], piles[1]) > (Arrays.stream(piles).sum() / 2);
+		}		
 		
-		while (turns <= piles.length / 2) {
-			for (int i = 0; i < mem.length; ++i) {
-				if (i == 0) {
-					mem[piles[0]] = piles[0];
-					mem[piles[piles.length - 1]] = piles[piles.length - 1];
-					mem2[piles[0]][0] = i + 1;
-					mem2[piles.length - 1][1] = piles.length - 2;
-					++turns;
-				}
-				else {
-					if (mem[i] > 0) {
-						if (mem2[i][0] > 0) {
-							for (int k = mem2[i][0]; k < piles.length; ++k) {
-								int value = mem[i] + piles[k];
-								mem[value] = value;
-								mem2[value][0] = k + 1;
-							}
-						}
-						
-						if (mem2[i][1] > 0) {
-							for (int k = mem2[i][1]; k > 0; --k) {
-								int value = mem[i] + piles[k];
-								mem[value] = value;
-								mem2[value][1] = k - 1;
-							}						
-						}
-					}
-				}			
-			}
+		int [][] mem = new int[piles.length][piles.length];
+		int max = max(piles, mem, true, 0, piles.length - 1);		
+		return max > (Arrays.stream(piles).sum() / 2);
+	}
+	
+	public int max(int [] piles, int [][] mem, boolean turn, int start, int end) {
+		if (mem[start][end] > 0) {
+			return mem[start][end];
 		}
 		
-		int max = Arrays.stream(mem).max().getAsInt();
-		int sum = Arrays.stream(mem).sum();
-		return (max > (sum / 2));
-	}
-
+		if (end - 1 == start) {
+			int value = 0;
+			if (turn) {
+				value = Math.max(piles[start], piles[end]);
+				mem[start][end] = value;
+			}
+			else {
+				value = Math.min(piles[start], piles[end]);
+				mem[start][end] = value;
+			}
+			
+			return value;
+		}				
+		
+		int max1 = piles[start] + max(piles, mem, !turn, start + 1, end);
+		int max2 = piles[end] + max(piles, mem, !turn, start, end - 1);
+		mem[start][end] = Math.max(max1, max2);
+		return mem[start][end]; 
+	}	
 }
