@@ -15,7 +15,7 @@ public class Fibo2 {
 			return 0;
 		}
 		
-		if (n <= 3) {
+		if (n <= 2) {
 			return 1;
 		}
 		
@@ -28,9 +28,8 @@ public class Fibo2 {
 		
 		mem[1] = 0;
 		mem[2] = 1;
-		mem[3] = 1;
 		
-		for (int i = 4; i <= n; ++i) {			
+		for (int i = 3; i <= n; ++i) {			
 			mem[i] = mem[i - 1] + mem[i - 2];			
 		}
 		
