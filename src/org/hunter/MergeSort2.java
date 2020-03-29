@@ -2,56 +2,67 @@ package org.hunter;
 
 public class MergeSort2 {
 
-	public static void main(String [] args) {
-		int [] arr = new int [] {5, 3, 2, 1, 4, 6};
-		MergeSort2 m = new MergeSort2();
-		int [] sorted = m.sort(arr, 0, arr.length - 1);
-		for (int i = 0; i < sorted.length; ++i) {
-			System.out.println(sorted[i]);
-		}
-	}
+    public static void main(String [] args) {
+        int [] arr = new int [] {
+                4,
+                44,
+                22,
+                11,
+                23,
+                8
+        };
+        MergeSort2 m = new MergeSort2();
+        int [] sorted = m.sort(arr);
+        for (int i = 0; i < sorted.length; ++i) {
+            System.out.println(sorted[i]);
+        }
+    }
 
-	public int [] sort(int [] arr, int start, int end) {
-		if (start >= end) {
-			return new int [] { arr[end] };
-		}
+    public int [] sort(int [] arr) {
+        return sort(arr, 0, arr.length - 1);
+    }
 
-		int mid = start + ((end - start) / 2);
+    public int [] sort(int [] arr, int start, int end) {
+        if (start >= end) {
+            return new int [] { arr[end] };
+        }
 
-		int [] arr1 = sort(arr, start, mid);
-		int [] arr2 = sort(arr, mid + 1, end);
+        int mid = start + ((end - start) / 2);
 
-		int [] newArr = new int[arr1.length + arr2.length];
+        int [] arr1 = sort(arr, start, mid);
+        int [] arr2 = sort(arr, mid + 1, end);
 
-		int left = 0;
-		int right = 0;
-		for (int i = 0; i < newArr.length; ++i) {
-			if (left >= arr1.length) {
-				newArr[i] = arr2[right];
-				++right;
-				continue;
-			}
+        int [] newArr = new int[arr1.length + arr2.length];
 
-			if (right >= arr2.length) {
-				newArr[i] = arr1[left];
-				++left;
-				continue;
-			}
+        int left = 0;
+        int right = 0;
+        for (int i = 0; i < newArr.length; ++i) {
+            if (left >= arr1.length) {
+                newArr[i] = arr2[right];
+                ++right;
+                continue;
+            }
 
-			if (arr1[left] < arr2[right]) {
-				newArr[i] = arr1[left];
-				++left;
-				continue;
-			}
+            if (right >= arr2.length) {
+                newArr[i] = arr1[left];
+                ++left;
+                continue;
+            }
 
-			if (arr1[left] > arr2[right]) {
-				newArr[i] = arr2[right];
-				++right;
-				continue;
-			}
-		}
+            if (arr1[left] < arr2[right]) {
+                newArr[i] = arr1[left];
+                ++left;
+                continue;
+            }
 
-		return newArr;
-	}
+            if (arr1[left] > arr2[right]) {
+                newArr[i] = arr2[right];
+                ++right;
+                continue;
+            }
+        }
+
+        return newArr;
+    }
 
 }
