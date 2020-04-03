@@ -46,7 +46,7 @@ public class QuickSort<T extends Comparable<T>> {
     }
 
     public static void main(String[] args) {
-        Integer[] intsToSort = { 99, 77, 555, 10, 8, 7, 1, 5000, 2000 };
+        Integer[] intsToSort = new Integer [] {5, 7, 8, 3, 2, 1, 4, 6};
 
         System.out.println("Before sort:");
         for (int i = 0; i < intsToSort.length; ++i) {
