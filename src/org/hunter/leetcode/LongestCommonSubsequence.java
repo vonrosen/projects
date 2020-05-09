@@ -70,24 +70,39 @@ public class LongestCommonSubsequence {
 					
 					for (int k = j + 1; k < matches2.size(); ++k) {
 						String [] string3 = matches2.get(k);
-						after2.add(string3);
+						after2.add(string3);						
 					}
 
 					List<String []> after2Matching = new ArrayList<String []>();
-					index = 0;
-					for (int l = i + 1; l < matches.size(); ++l) {
-						String [] string4 = matches.get(l);
-						if (index < after2.size()) {
-							String [] s = after2.get(index);
-							if (s != null) {
-								if (s[0].equals(string4[0])) {
-									after2Matching.add(string4);	
-								}														
-							}									
-							++index;							
-						}
+					
+					//all after text2 first char
+					for (String [] s : after2) {//text2
+						Map<String,String> alreadyAdded = new HashMap<String, String>();
+						for (int l = i + 1; l < matches.size(); ++l) {
+							String [] string4 = matches.get(l);//text1
+							if (s[0].equals(string4[0])) {
+								if (alreadyAdded.get(s[0]) == null) {
+									after2Matching.add(new String [] { s[0], string4[1] });
+									alreadyAdded.put(s[0], s[0]);									
+								}
+							}
+						}											
 					}
-					maxSize = Math.max(after2Matching.size() + 1, maxSize);
+					
+					for (int m = 0; m < after2Matching.size(); ++m) {
+						int size = 1;
+						String [] s = after2Matching.get(m);
+						pos = Integer.parseInt(s[1]);
+						for (int n = m + 1; n < after2Matching.size(); ++n) {
+							String [] s2 = after2Matching.get(n);
+							int pos2 = Integer.parseInt(s2[1]);
+							if (pos2 > pos) {
+								++size;
+								pos = pos2;
+							}				
+						}
+						maxSize = Math.max(size + 1, maxSize);
+					}					
 				}
 			}			
 		}
