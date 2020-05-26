@@ -3,12 +3,12 @@ package org.hunter.leetcode;
 import java.util.ArrayList;
 import java.util.List;
 
-class TreeNode {
+class TreeNode2 {
     int val;
-    TreeNode left;
-    TreeNode right;
+    TreeNode2 left;
+    TreeNode2 right;
 
-    TreeNode(int x) {
+    TreeNode2(int x) {
         val = x;
     }
 }
@@ -27,19 +27,19 @@ public class KthSmallest {
 //                3
         //output: 3
 
-        TreeNode t = new TreeNode(5);
-        t.left = new TreeNode(3);
-        t.right = new TreeNode(6);
-        t.left.left = new TreeNode(2);
-        t.left.right = new TreeNode(4);
-        t.left.left.left = new TreeNode(1);
+        TreeNode2 t = new TreeNode2(5);
+        t.left = new TreeNode2(3);
+        t.right = new TreeNode2(6);
+        t.left.left = new TreeNode2(2);
+        t.left.right = new TreeNode2(4);
+        t.left.left.left = new TreeNode2(1);
         int k = 4;
 
         KthSmallest o = new KthSmallest();
         System.out.println(o.kthSmallest(t, k));
     }
 
-    public int kthSmallest(TreeNode root, int k) {
+    public int kthSmallest(TreeNode2 root, int k) {
         List<Integer> values = new ArrayList<Integer>();
 
         populateValuesList(root, values);
@@ -76,7 +76,7 @@ public class KthSmallest {
         values.set(index2, tmp);
     }
 
-    public void populateValuesList(TreeNode root, List<Integer> values) {
+    public void populateValuesList(TreeNode2 root, List<Integer> values) {
         if (root == null) {
             return;
         }

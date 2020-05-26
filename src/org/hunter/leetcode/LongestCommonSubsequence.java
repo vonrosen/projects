@@ -13,8 +13,8 @@ public class LongestCommonSubsequence {
 //		String text1 = "abc", text2 = "abc";
 //		String text1 = "abc", text2 = "def";
 		
-//		String text1 = "pmjghexybyrgzczy";
-//		String text2 = "hafcdqbgncrcbihkd";
+		String text1 = "pmjghexybyrgzczy";
+		String text2 = "hafcdqbgncrcbihkd";
 		//4
 		
 //		String text1 = "bsbininm";
@@ -23,8 +23,8 @@ public class LongestCommonSubsequence {
 //		String text1 = "yzebsbuxmtcfmtodclszgh";
 //		String text2 = "ejevmhcvshclydqrulwbyha";
 		
-		String text1 = "mhunuzqrkzsnidwbun";
-		String text2 = "szulspmhwpazoxijwbq";
+//		String text1 = "mhunuzqrkzsnidwbun";
+//		String text2 = "szulspmhwpazoxijwbq";
 		//6
 		
 //		String text1 = "pcbmdupybalwpkbidypqbwhefijytypwdwbsharqdurkrslqlqla";
@@ -67,42 +67,52 @@ public class LongestCommonSubsequence {
 				
 				if (string[0].equals(string2[0])) {
 					List<String[]> after2 = new ArrayList<String []>();
-					
+					List<String[]> after1 = new ArrayList<String []>();
 					for (int k = j + 1; k < matches2.size(); ++k) {
-						String [] string3 = matches2.get(k);
-						after2.add(string3);						
+						after2.add(matches2.get(k));
+					}
+					for (int l = i + 1; l < matches.size(); ++l) {
+						after1.add(matches.get(l));
 					}
 
-					List<String []> after2Matching = new ArrayList<String []>();
-					
-					//all after text2 first char
-					for (String [] s : after2) {//text2
-						Map<String,String> alreadyAdded = new HashMap<String, String>();
-						for (int l = i + 1; l < matches.size(); ++l) {
-							String [] string4 = matches.get(l);//text1
-							if (s[0].equals(string4[0])) {
-								if (alreadyAdded.get(s[0]) == null) {
-									after2Matching.add(new String [] { s[0], string4[1] });
-									alreadyAdded.put(s[0], s[0]);									
-								}
+					List<String[]> after2Matches = new ArrayList<String []>();
+					List<String[]> after1Matches = new ArrayList<String []>();
+					for (String [] s : after1) {
+						for (String [] s2 : after2) {
+							if (s[0].equals(s2[0])) {
+								after1Matches.add(s);
 							}
-						}											
-					}
-					
-					for (int m = 0; m < after2Matching.size(); ++m) {
-						int size = 1;
-						String [] s = after2Matching.get(m);
-						pos = Integer.parseInt(s[1]);
-						for (int n = m + 1; n < after2Matching.size(); ++n) {
-							String [] s2 = after2Matching.get(n);
-							int pos2 = Integer.parseInt(s2[1]);
-							if (pos2 > pos) {
-								++size;
-								pos = pos2;
-							}				
 						}
-						maxSize = Math.max(size + 1, maxSize);
-					}					
+					}
+					for (String [] s : after2) {
+						for (String [] s2 : after1) {
+							if (s[0].equals(s2[0])) {
+								after2Matches.add(s);
+							}
+						}
+					}
+					int matchCount = 0;
+					int index1 = after1Matches.size() - 1;
+					int index2 = after2Matches.size() - 1;
+					while (index1 >= 0 && index2 >= 0) {
+						if (after1Matches.get(index1)[0].equals(after2Matches.get(index2)[0])) {
+							++matchCount;
+							--index1;
+							--index2;
+						}
+						else if (index1 > index2) {
+							--index1;
+						}
+						else if (index1 < index2) {
+							--index2;
+						}
+						else if (index1 == index2) {
+							--index1;
+							--index2;
+						}
+					}
+
+					maxSize = Math.max(maxSize, 1 + matchCount);
 				}
 			}			
 		}
