@@ -42,7 +42,7 @@ public class QuickSort3 {
         System.out.println("");
     }
 
-    public static <T extends Comparable<T>> void sort(T [] arr, int start, int end) {
+    public static <T extends Comparable<? super T>> void sort(T [] arr, int start, int end) {
         if (start >= end) {
             return;
         }
@@ -51,7 +51,7 @@ public class QuickSort3 {
         sort(arr, pivot + 1, end);
     }
 
-    private static <T extends Comparable<T>> int partition(T [] arr, int start, int end) {
+    private static <T extends Comparable<? super T>> int partition(T [] arr, int start, int end) {
         int currentPivot = end;
         int newPivot = start;
         for (int i = start; i <= end - 1; ++i) {
@@ -66,7 +66,7 @@ public class QuickSort3 {
         return newPivot;
     }
 
-    private static <T extends Comparable<T>> void swap(T [] arr, int index1, int index2) {
+    private static <T extends Comparable<? super T>> void swap(T [] arr, int index1, int index2) {
         T tmp = arr[index1];
         arr[index1] = arr[index2];
         arr[index2] = tmp;
